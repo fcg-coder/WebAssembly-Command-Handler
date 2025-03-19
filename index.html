@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebAssembly Output</title>
+    <title>Cpp_WebAsm</title>
     <style>
         body {
             background-color: black;
@@ -17,7 +18,9 @@
             height: 100vh;
             margin: 0;
             overflow: hidden;
+            line-height: 1;
         }
+
         #output {
             white-space: pre-wrap;
             word-wrap: break-word;
@@ -25,6 +28,7 @@
             padding: 10px;
             overflow-y: auto;
         }
+
         #input {
             width: 100%;
             background-color: black;
@@ -36,11 +40,13 @@
             outline: none;
             box-sizing: border-box;
         }
+
         .hidden {
             display: none;
         }
     </style>
 </head>
+
 <body>
     <div class="spinner" id="spinner"></div>
     <div class="emscripten" id="status">Downloading...</div>
@@ -63,21 +69,21 @@
         var Module = {
             preRun: [],
             postRun: [],
-            print: (function() {
-                return function(text) {
+            print: (function () {
+                return function (text) {
                     if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
                     console.log(text);
                     if (outputElement) {
                         outputElement.innerHTML += text + "<br>";
-                        outputElement.scrollTop = outputElement.scrollHeight; // Автопрокрутка вниз
+                        outputElement.scrollTop = outputElement.scrollHeight;
                     }
                 };
             })(),
             canvas: (() => {
                 var canvas = document.getElementById('canvas');
-                canvas.addEventListener("webglcontextlost", (e) => { 
-                    alert('WebGL context lost. You will need to reload the page.'); 
-                    e.preventDefault(); 
+                canvas.addEventListener("webglcontextlost", (e) => {
+                    alert('WebGL context lost. You will need to reload the page.');
+                    e.preventDefault();
                 }, false);
                 return canvas;
             })(),
@@ -106,39 +112,45 @@
             totalDependencies: 0,
             monitorRunDependencies: (left) => {
                 this.totalDependencies = Math.max(this.totalDependencies, left);
-                Module.setStatus(left ? 'Preparing... (' + (this.totalDependencies-left) + '/' + this.totalDependencies + ')' : 'All downloads complete.');
+                Module.setStatus(left ? 'Preparing... (' + (this.totalDependencies - left) + '/' + this.totalDependencies + ')' : 'All downloads complete.');
             }
         };
 
-        Module.setStatus('Downloading...');
-
-        // Удаляем обработчик ошибок
-        // window.onerror = (event) => {
-        //     Module.setStatus('Exception thrown, see JavaScript console');
-        //     spinnerElement.style.display = 'none';
-        //     Module.setStatus = (text) => {
-        //         if (text) console.error('[post-exception status] ' + text);
-        //     };
-        // };
-
-        // Обработчик ввода текста
         inputElement.addEventListener('keydown', (event) => {
             if (event.key === 'Enter') {
                 const command = inputElement.value.trim();
                 if (command) {
-                    Module.print("> " + command); // Отобразить команду в выводе
-                    if (Module.ccall) {
-                        Module.ccall('processInput', // Имя функции в C++
-                            null, // Возвращаемый тип
-                            ['string'], // Типы аргументов
-                            [command] // Аргументы
-                        );
+                    if (command.toLowerCase() === 'clear') {
+                        outputElement.innerHTML = '';
+                    } else {
+                        Module.print("> " + command);
+                        if (Module.ccall) {
+                            Module.ccall('processInput',
+                                null,
+                                ['string'],
+                                [command]
+                            );
+                        }
                     }
-                    inputElement.value = ''; // Очистить поле ввода
+                    inputElement.value = '';
                 }
             }
         });
+
+        window.addEventListener('resize', () => {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            if (Module.ccall) {
+                Module.ccall('setSize',
+                    null,
+                    ['number', 'number'],
+                    [width, height]
+                );
+            }
+        });
+    </script>
     </script>
     <script async type="text/javascript" src="main.js"></script>
 </body>
+
 </html>

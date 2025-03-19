@@ -6,61 +6,46 @@
 #include <atomic>
 
 std::atomic<bool> running(true);
+inputOutputHandler* inputOutputHandler::m_instance = nullptr;
+JSStreamBuffer jsStreamBuffer;
+std::ostream jsCout(&jsStreamBuffer);
 
+int MainWindow::windowHeight = 0;
+int MainWindow::windowWidth = 0;
 
 #ifndef DEBUG
 
-extern "C" EMSCRIPTEN_KEEPALIVE void printToJS(const char* text) {
+extern "C" EMSCRIPTEN_KEEPALIVE void printToJS(const char* text)
+{
     EM_ASM({
         const output = document.getElementById('output');
         if (output) {
             output.innerHTML += UTF8ToString($0) + "<br>";  
             output.scrollTop = output.scrollHeight;   
-        }
-    }, text);
+        } }, text);
 }
 
-extern "C" EMSCRIPTEN_KEEPALIVE void processInput(const char* input) {
-    std::string command(input);
-    CommandHandler::getInstance()->setCommand(command);
+extern "C" EMSCRIPTEN_KEEPALIVE void processInput(const char* input)
+{
+    if (input != nullptr)
+    {
+        std::string _input(input);
+        inputOutputHandler::getInstance()->input(_input);
+    }
 }
 
-
-class JSStreamBuffer : public std::streambuf {
-private:
-    std::string buffer;
-
-protected:
-    virtual int overflow(int c) override {
-        if (c != EOF) {
-            buffer += static_cast<char>(c);  
-            if (c == '\n') {  
-                printToJS(buffer.c_str());
-                buffer.clear();
-            }
-        }
-        return c;
-    }
-
-    virtual int sync() override {
-        if (!buffer.empty()) {  
-            printToJS(buffer.c_str());
-            buffer.clear();
-        }
-        return 0;
-    }
-};
-
-JSStreamBuffer jsStreamBuffer;
-std::ostream jsCout(&jsStreamBuffer);
+extern "C" EMSCRIPTEN_KEEPALIVE void setSize(const int height, const int width)
+{
+    inputOutputHandler::getInstance()-> setSize(height, width);
+}
 
 #endif
 
-int main() { 
-     
-    #ifndef DEBUG
-    std::cout.rdbuf(&jsStreamBuffer);  
-    #endif
-    std::cout << "Start" << std::endl;
+int main()
+{
+#ifndef DEBUG
+    std::cout.rdbuf(&jsStreamBuffer);
+#endif
+
     return 0;
 }

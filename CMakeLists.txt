@@ -12,7 +12,7 @@ add_executable(main src/main.cpp)
 if (EMSCRIPTEN)
     set_target_properties(main PROPERTIES SUFFIX ".html")
     set(CMAKE_EXECUTABLE_SUFFIX ".html")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s WASM=1 -s EXTRA_EXPORTED_RUNTIME_METHODS='[\"ccall\", \"cwrap\"]'")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s WASM=1 -s  EXTRA_EXPORTED_RUNTIME_METHODS='[\"ccall\", \"cwrap\"]'")
 endif()
 
 add_subdirectory(src/command_handler)

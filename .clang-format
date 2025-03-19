@@ -1,0 +1,223 @@
+Language: Cpp
+BasedOnStyle: LLVM
+
+# Дополнительный отступ или отступ модификаторов доступа
+AccessModifierOffset: -4
+
+# Размер отступа 
+IndentWidth: 4
+
+# Размер TAB-а
+TabWidth: 4
+
+# Лимит кол-ва символов в строке
+ColumnLimit: 0
+
+
+# Выравнивает несколько присваиваний подрят по "=". True - выравнивает. False - нет
+# int a            = 1;
+# int somelongname = 2;
+# double c         = 3;
+AlignConsecutiveAssignments: false
+
+# Выравнивание битовых полей True - выравнивает. False - нет.
+# int aaaa : 1;
+# int b    : 12;
+# int ccc  : 8;
+AlignConsecutiveBitFields: true
+
+# Стиль выравнивания последовательных объявлений
+# int         aaaa = 12;
+# float       b = 23;
+# std::string ccc;
+AlignConsecutiveDeclarations: false
+
+# Стиль выравнивания последовательных макросов
+# #define SHORT_NAME       42
+# #define LONGER_NAME      0x007f
+# #define EVEN_LONGER_NAME (2)
+AlignConsecutiveMacros: true
+
+# Параметры выравнивания обратной косой черты в экранированных символах новой строки
+# #define A    \
+#   int aaaa;  \
+#   int b;     \
+AlignEscapedNewlines: Left
+
+# Параметр объединения коротких блоков в одну строку в зависимости от содержимого
+# Never  
+# Empty  
+# Always 
+AllowShortBlocksOnASingleLine: Empty
+
+# Параметр объединения короткого case-а в одну строку
+AllowShortCaseLabelsOnASingleLine: false
+
+# Параметр объединения короткого enum-а в одну строку
+AllowShortEnumsOnASingleLine: false
+
+# Параметр объединения коротких функций и методов в одну строку
+# None 
+# InlineOnly  Только те, что определены внутри класса
+# Empty       Только пустые
+# Inline      Те, что определены внутри класса и пустые
+# All
+AllowShortFunctionsOnASingleLine: InlineOnly
+
+# Параметр разрешает объединять if(true) return; в одну строку
+# Never
+# WithoutElse
+# OnlyFirstIf
+# AllIfsAndElse
+AllowShortIfStatementsOnASingleLine: false
+
+# Параметр разрешает размещать while(true) continue; в одну строку 
+AllowShortLoopsOnASingleLine: false
+
+#
+# None
+# All
+# TopLevel
+# AllDefinitions
+# TopLevelDefinitions
+AlwaysBreakAfterReturnType: None
+
+# Стиль расстановки пробелов в битовых полях
+# Both    unsigned bf : 2;
+# None    unsigned bf:2;
+# Before  unsigned bf :2;
+# After   unsigned bf: 2;
+BitFieldColonSpacing: Both
+
+# Кол-во отступов в инициализационных списках. Если не устновлено, то 
+# применяется ContinuationIndentWidth. 
+# Работает с 17ой версии
+# BracedInitializerIndentWidth: 4
+
+# Параметр определяет в каких случаях перед модификатором доступаа ставится пустая строка
+# Never
+# Leave
+# Always
+EmptyLineBeforeAccessModifier: Always
+
+# Параметр сортировки блоков include-ов
+# Preserve Сортировка блоков отдельно
+# Merge Объединение всех блоков и их сортировка
+# Regroup Объединение всех блоков и их сортировка, а затем разделение по группам на приоритеты
+# IncludeBlocks: Preserve 
+
+# Параметр определяет наличие отступа на один уровень после case-а
+IndentCaseBlocks: false
+
+# Отступ на один уровень case-а относительно switch-a
+IndentCaseLabels: true
+
+# Используемый стиль отступа директивы препроцессора
+# None
+# AfterHash
+# BeforeHash
+IndentPPDirectives: AfterHash
+
+# Вставлять фигурные скобки после операторов (if, else, for, do, and while) за исключением
+# когда операторы находятся внутри определений макросов или фигурные скобки заключают в 
+# себе дерективы препроцессора
+# Работает с 15ой версии
+# InsertBraces: true
+
+# Вставить пустую строку в конце файла, если она отсутствует
+# Работает с 16ой версии
+# InsertNewlineAtEOF: true
+
+# Максимальное сохраняемое кол-во последовательных пустых строк
+MaxEmptyLinesToKeep: 1
+
+# Отступ, используемый для пространств имен. All - каждый вложенный namespace будет с отступом
+NamespaceIndentation: All
+
+# Стиль выравнивания указателя и ссылки
+PointerAlignment: Left
+
+# Различные способы организации спецификаторов и квалификаторов
+# Leave Не изменять
+# Left  const int a;
+# Right int const a;
+# Custom
+QualifierAlignment: Leave
+
+# Стиль выравнивая ссылок
+# Pointer
+# Left    int& a;
+# Right   int &a;
+# Middle  int & a;
+ReferenceAlignment: Left
+
+# Параметр сортировки include-ов
+# Never
+# CaseSensitive Сортировка по ASCII-коду с учетом регистра
+# CaseInsensitive Сортировка по алфавиту без учета регистра
+SortIncludes: Never
+
+# Пробел после C style casts
+# True: (uint8_t) var;    False: (uint8_t)var;
+SpaceAfterCStyleCast: true
+
+# Пробел перед оператором !
+# True: ! var;    False: !var;
+SpaceAfterLogicalNot: true
+
+# Пробел перед оператором присваивания
+# True: a += 42;    False: a+= 42;
+SpaceBeforeAssignmentOperators: true
+
+# Пробел перед двоеточием в case-e
+# True: case 1 : break;    False: case 1: break;
+SpaceBeforeCaseColon: false
+
+# Пробел перед инициализационным списком 
+# True: Foo {};                    False: Foo{};    
+# True: new int[3] { 1, 2, 3 };    False: new int[3]{ 1, 2, 3 };
+SpaceBeforeCpp11BracedList: true 
+
+# Пробелы перед инициализатором конструктора
+# True: Foo::Foo() : a(a) {}    False: Foo::Foo(): a(a) {}
+SpaceBeforeCtorInitializerColon: true
+
+# Пробелы перед двоеточием наследования
+# True: class Foo : Bar {}    False: class Foo: Bar {}
+SpaceBeforeInheritanceColon: true
+
+# Определяет, в каких случаях стоит ставить пробел перед открывающимися скобками
+# Never
+# ControlStatements
+# ControlStatementsExceptControlMacros
+# NonEmptyParentheses
+# Always
+# Custom
+SpaceBeforeParens: ControlStatements
+
+# Добавление пробела перед [. Не влияет на лямбды. Пробел добавляется только перед первой [
+# True: int a [5][5]    False: int a[5][5]
+SpaceBeforeSquareBrackets: false
+
+# Пробел внутри пустных {}
+# True: while (true) { }    False: while (true) {}
+SpaceInEmptyBlock: false
+
+# Configure each individual brace in BraceWrapping
+BreakBeforeBraces: Custom
+
+# Control of individual brace wrapping cases
+BraceWrapping: {
+    AfterCaseLabel: 'true'
+    AfterClass: 'true'
+    AfterControlStatement: 'Always'
+    AfterEnum : 'true'
+    AfterFunction : 'true'
+    AfterNamespace : 'true'
+    AfterStruct : 'true'
+    AfterUnion : 'true'
+    AfterExternBlock : 'true'
+    BeforeElse : 'true'
+    BeforeWhile : 'false'
+    IndentBraces : 'false'  
+}

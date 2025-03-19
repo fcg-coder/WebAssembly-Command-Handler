@@ -1,7 +1,9 @@
-#include "command_handler.hpp"
 #include "../main.hpp"
+#include <iostream>
 
-CommandHandler *CommandHandler::m_instance = nullptr;
+CommandHandler* CommandHandler::m_instance = nullptr;
+
+inputOutputHandler* screen = inputOutputHandler::getInstance();
 
 CommandHandler::CommandHandler()
 {
@@ -11,9 +13,10 @@ CommandHandler::CommandHandler()
 void CommandHandler::initializeCommands()
 {
     commandMap["help"] = std::make_unique<CommandHelp>();
+    commandMap["draw"] = std::make_unique<CommandDrawSquare>();
 }
 
-CommandHandler *CommandHandler::getInstance()
+CommandHandler* CommandHandler::getInstance()
 {
     if (m_instance == nullptr)
     {
@@ -22,34 +25,30 @@ CommandHandler *CommandHandler::getInstance()
     return m_instance;
 }
 
-void CommandHandler::setCommand(const std::string &command)
+void CommandHandler::setCommand(const std::string& command)
 {
-    m_current_command = command;
+    m_currentCommand = command;
     handler();
 }
 
 std::string CommandHandler::getCommand() const
 {
-    return m_current_command;
+    return m_currentCommand;
 }
 
 void CommandHandler::handler()
 {
-    if (!m_current_command.empty())
+
+    if (! m_currentCommand.empty())
     {
-        auto it = commandMap.find(m_current_command);
+        auto it = commandMap.find(m_currentCommand);
         if (it != commandMap.end())
         {
             it->second->execute();
         }
         else
         {
-            std::cout << "HELP handler";
+            screen->output("Unknow command. Use help");
         }
     }
-}
-
-void CommandHelp::execute()
-{
-    std::cout << "HELP handler";
 }

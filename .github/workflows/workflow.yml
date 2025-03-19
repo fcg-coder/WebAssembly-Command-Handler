@@ -1,0 +1,35 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - '**'  
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/deploy'
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up SSH agent
+      uses: webfactory/ssh-agent@v0.9.0
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: Add server to known hosts
+      run: |
+        mkdir -p ~/.ssh
+        ssh-keyscan -H -p 228 ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+
+    - name: Remove old files via SCP
+      run: |
+       ssh -p 228 root@${{ secrets.SERVER_IP }} "cd / && rm -rf webasm/"
+    
+    - name: Copy files via SCP
+      run: |
+        scp -P 228 -r ./* root@${{ secrets.SERVER_IP }}:~/webasm/
+
+    - name: Run docker-compose
+      run: echo "Running docker-compose..." && ssh -p 228 root@${{ secrets.SERVER_IP }} 'cd ~/webasm && docker-compose down && docker-compose up --build -d'
