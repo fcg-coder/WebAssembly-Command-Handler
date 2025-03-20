@@ -6,9 +6,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
  
-add_executable(main src/main.cpp)
+add_executable(main  src/main.cpp src/screen.cpp)
 
- 
 if (EMSCRIPTEN)
     set_target_properties(main PROPERTIES SUFFIX ".html")
     set(CMAKE_EXECUTABLE_SUFFIX ".html")

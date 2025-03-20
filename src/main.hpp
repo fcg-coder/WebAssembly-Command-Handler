@@ -5,7 +5,7 @@
 #include <atomic>
 #include <cmath>
 #include <cstdio>
-
+#include <emscripten/bind.h>
 class inputOutputHandler;
 class CommandHandler;
 

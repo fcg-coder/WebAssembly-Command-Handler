@@ -27,6 +27,7 @@
             flex-grow: 1;
             padding: 10px;
             overflow-y: auto;
+            /* Временная рамка для отладки */
         }
 
         #input {
@@ -44,6 +45,20 @@
         .hidden {
             display: none;
         }
+
+        #canvas {
+            width: 100%;
+            height: 100%;
+            image-rendering: pixelated;
+            border: 1px solid white;
+        }
+
+        #canvas-container {
+            display: none;
+            /* Скрываем канвас по умолчанию */
+            width: 100%;
+            height: 100%;
+        }
     </style>
 </head>
 
@@ -53,8 +68,8 @@
     <div class="emscripten">
         <progress value="0" max="100" id="progress" class="hidden"></progress>
     </div>
-    <div class="emscripten_border">
-        <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex="-1"></canvas>
+    <div id="canvas-container">
+        <canvas id="canvas" oncontextmenu="event.preventDefault()" tabindex="-1"></canvas>
     </div>
     <div id="output"></div>
     <input id="input" type="text" placeholder="Введите команду и нажмите Enter">
@@ -65,6 +80,63 @@
         var spinnerElement = document.getElementById('spinner');
         var outputElement = document.getElementById('output');
         var inputElement = document.getElementById('input');
+        var canvasContainer = document.getElementById('canvas-container');
+        var canvas = document.getElementById('canvas');
+
+        let moduleInitialized = false;
+        let screenPtr = null;  // Переменная для хранения указателя на экран
+
+        // Функция для обновления канваса
+        function updateCanvas() {
+            if (!moduleInitialized) {
+                console.error("WebAssembly не загружен!");
+                return;
+            }
+
+            if (typeof Module !== "undefined" && Module._getScreen) {
+                screenPtr = Module._getScreen();
+
+                if (!screenPtr) {
+                    console.error("Ошибка: ptr равен нулю!");
+                    return;
+                }
+
+                let pixels = new Uint32Array(Module.HEAPU32.buffer, screenPtr, 256 * 256);
+                let ctx = canvas.getContext('2d');
+                let imageData = ctx.createImageData(256, 256);
+                let data = imageData.data;
+
+                for (let i = 0; i < pixels.length; i++) {
+                    let color = pixels[i];
+                    let index = i * 4;
+                    data[index] = (color & 0xFF);          // R
+                    data[index + 1] = (color >> 8) & 0xFF; // G
+                    data[index + 2] = (color >> 16) & 0xFF;// B
+                    data[index + 3] = (color >> 24) & 0xFF;// A
+                }
+
+                ctx.putImageData(imageData, 0, 0);
+            } else {
+                console.error("WebAssembly не загружен или метод _getScreen не найден!");
+            }
+        }
+
+        // Загружаем WebAssembly
+        function loadWasm() {
+            if (typeof Module !== "undefined") {
+                Module.onRuntimeInitialized = function () {
+                    console.log("WebAssembly загружен и готов.");
+                    moduleInitialized = true;  // Устанавливаем флаг, что WebAssembly инициализировано
+                };
+            } else {
+                console.error("WebAssembly не был правильно загружен!");
+            }
+        }
+
+        // Загружаем WebAssembly и вызываем загрузку после завершения
+        window.onload = function () {
+            loadWasm();
+        };
 
         var Module = {
             preRun: [],
@@ -72,7 +144,7 @@
             print: (function () {
                 return function (text) {
                     if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
-                    console.log(text);
+                    console.log("Print:", text); // Логируем вывод
                     if (outputElement) {
                         outputElement.innerHTML += text + "<br>";
                         outputElement.scrollTop = outputElement.scrollHeight;
@@ -80,7 +152,6 @@
                 };
             })(),
             canvas: (() => {
-                var canvas = document.getElementById('canvas');
                 canvas.addEventListener("webglcontextlost", (e) => {
                     alert('WebGL context lost. You will need to reload the page.');
                     e.preventDefault();
@@ -119,17 +190,28 @@
         inputElement.addEventListener('keydown', (event) => {
             if (event.key === 'Enter') {
                 const command = inputElement.value.trim();
+                console.log("Введена команда:", command); // Логируем команду
                 if (command) {
                     if (command.toLowerCase() === 'clear') {
+                        console.log("Очистка вывода"); // Логируем очистку
                         outputElement.innerHTML = '';
+                    } else if (command.toLowerCase() === 'screen') {
+                        // Переключаемся на канвас
+                        outputElement.style.display = 'none';
+                        inputElement.style.display = 'none';
+                        canvasContainer.style.display = 'block';
+                        updateCanvas(); // Обновляем канвас
                     } else {
                         Module.print("> " + command);
                         if (Module.ccall) {
+                            console.log("Вызов processInput с командой:", command); // Логируем вызов
                             Module.ccall('processInput',
                                 null,
                                 ['string'],
                                 [command]
                             );
+                        } else {
+                            console.error("Module.ccall не доступен!"); // Логируем ошибку
                         }
                     }
                     inputElement.value = '';
@@ -148,7 +230,6 @@
                 );
             }
         });
-    </script>
     </script>
     <script async type="text/javascript" src="main.js"></script>
 </body>
