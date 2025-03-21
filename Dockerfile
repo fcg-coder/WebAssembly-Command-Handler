@@ -17,6 +17,7 @@ RUN emcmake cmake -S . -B build && \
 FROM nginx:alpine
 
 
+COPY ByteBounce.ttf /usr/share/nginx/html/
 COPY index.html /usr/share/nginx/html/
 COPY --from=build /app/build/main.html /usr/share/nginx/html/
 COPY --from=build /app/build/main.js /usr/share/nginx/html/
