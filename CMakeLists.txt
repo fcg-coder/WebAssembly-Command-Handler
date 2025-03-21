@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
  
-add_executable(main  src/main.cpp src/screen.cpp)
+add_executable(main  src/main.cpp)
 
 if (EMSCRIPTEN)
     set_target_properties(main PROPERTIES SUFFIX ".html")
@@ -16,3 +16,6 @@ endif()
 
 add_subdirectory(src/command_handler)
 target_link_libraries(main PRIVATE command_handler)
+
+add_subdirectory(src/graphic_lib)
+target_link_libraries(main PRIVATE graphic_lib)

@@ -3,7 +3,7 @@
 
 CommandHandler* CommandHandler::m_instance = nullptr;
 
-inputOutputHandler* screen = inputOutputHandler::getInstance();
+extern InputOutputHandler* IOH;
 
 CommandHandler::CommandHandler()
 {
@@ -48,7 +48,7 @@ void CommandHandler::handler()
         }
         else
         {
-            screen->output("Unknow command. Use help");
+            IOH->output("Unknow command. Use help");
         }
     }
 }

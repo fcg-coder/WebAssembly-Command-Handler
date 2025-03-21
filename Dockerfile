@@ -14,6 +14,7 @@ RUN emcmake cmake -S . -B build && \
     emmake cmake --build build
 
 
+
 FROM nginx:alpine
 
 
