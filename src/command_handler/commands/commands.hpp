@@ -20,6 +20,17 @@ public:
     void execute() override;
 };
 
+class CommandScreen : public CommandBase
+{
+public:
+    void execute() override;
+};
+
+class CommandShell : public CommandBase
+{
+public:
+    void execute() override;
+};
 class CommandDrawSquare : public CommandBase
 {
 public:

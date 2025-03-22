@@ -43,3 +43,13 @@ void CommandDrawSquare::execute()
     // }
     // IOH->output(outputStream.str());
 }
+
+void CommandScreen::execute()
+{
+    IOH->mode = InputOutputMode::SCREEN;
+}
+
+void CommandShell::execute()
+{
+    IOH->mode = InputOutputMode::SHELL;
+}

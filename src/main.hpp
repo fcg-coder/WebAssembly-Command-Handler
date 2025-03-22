@@ -75,7 +75,7 @@ private:
     InputOutputHandler() {}
 
 public:
-    InputOutputMode mode;
+    static InputOutputMode mode;
 
     InputOutputHandler(const InputOutputHandler&) = delete;
     InputOutputHandler& operator=(const InputOutputHandler&) = delete;
@@ -84,6 +84,7 @@ public:
     {
         if (! m_instance)
         {
+            mode = InputOutputMode::SHELL;
             m_instance = new InputOutputHandler();
         }
         return m_instance;

@@ -81,10 +81,18 @@ public:
 
     void updateScreen()
     {
-        for (int i = 0; i < m_windowWidth * m_windowHeight; i++)
+        int pixel_ = 0;
+        for (int i = 0; i < m_windowHeight; i++)
         {
-            Pixel pixel(static_cast<uint8_t>(i), static_cast<uint8_t>(i), static_cast<uint8_t>(i), static_cast<uint8_t>(i));
-            screenBuff[i] = pixel.serialize();
+
+            for (int j = 0; j < m_windowWidth; j++)
+            {
+                float color = i + j / m_windowWidth * m_windowHeight;
+
+                Pixel pixel(static_cast<uint8_t>(color), static_cast<uint8_t>(color), static_cast<uint8_t>(color), static_cast<uint8_t>(255));
+                screenBuff[pixel_] = pixel.serialize();
+                pixel_++;
+            }
         }
     }
 };

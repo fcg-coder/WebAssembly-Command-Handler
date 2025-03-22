@@ -83,7 +83,7 @@
         <canvas id="canvas" oncontextmenu="event.preventDefault()" tabindex="-1"></canvas>
     </div>
     <div id="output"></div>
-    <input id="input" type="text" placeholder="Type the command and press Enter">
+    <input id="input" type="text" style="font-family: ByteBounce, Arial" placeholder="Type the command and press Enter">
 
     <script type="text/javascript">
         var statusElement = document.getElementById('status');
@@ -96,7 +96,7 @@
 
         let moduleInitialized = false;
         let screenPtr = null;  // Переменная для хранения указателя на экран
-
+        let mode = 0;
         // Функция для обновления канваса
         function updateCanvas() {
             if (!moduleInitialized) {
@@ -112,10 +112,15 @@
                     return;
                 }
 
-                let pixels = new Uint32Array(Module.HEAPU32.buffer, screenPtr, 256 * 256);
+                const width = window.innerWidth;
+                const height = window.innerHeight;
+                console.log("updateCanvas");
+                let pixels = new Uint32Array(Module.HEAPU32.buffer, screenPtr, width * width);
                 let ctx = canvas.getContext('2d');
-                let imageData = ctx.createImageData(256, 256);
+                let imageData = ctx.createImageData(width, width);
                 let data = imageData.data;
+
+
 
                 for (let i = 0; i < pixels.length; i++) {
                     let color = pixels[i];
@@ -138,7 +143,11 @@
                 Module.onRuntimeInitialized = function () {
                     console.log("WebAssembly загружен и готов.");
                     moduleInitialized = true;  // Устанавливаем флаг, что WebAssembly инициализировано
+                    mode = Module._getMode();
+                    console.log(mode);
                 };
+
+
             } else {
                 console.error("WebAssembly не был правильно загружен!");
             }
@@ -146,7 +155,9 @@
 
         // Загружаем WebAssembly и вызываем загрузку после завершения
         window.onload = function () {
+
             loadWasm();
+
         };
 
         var Module = {
@@ -195,24 +206,51 @@
             monitorRunDependencies: (left) => {
                 this.totalDependencies = Math.max(this.totalDependencies, left);
                 Module.setStatus(left ? 'Preparing... (' + (this.totalDependencies - left) + '/' + this.totalDependencies + ')' : 'All downloads complete.');
+
             }
         };
 
+
+
+
+
+
+
+        function loop() {
+
+
+            if (mode == 1) // SCREEN
+            {
+                // Переключаемся на канвас
+                outputElement.style.display = 'none';
+                // inputElement.style.display = 'none';
+                canvasContainer.style.display = 'block';
+                updateCanvas(); // Обновляем канвас
+            }
+            else if (mode == 0) { // SHELL
+                outputElement.style.display = 'block';
+                // inputElement.style.display = 'block';
+                canvasContainer.style.display = 'none';
+            }
+
+        }
+
+        loop();
+
         inputElement.addEventListener('keydown', (event) => {
+
             if (event.key === 'Enter') {
+
                 const command = inputElement.value.trim();
+
                 console.log("Введена команда:", command); // Логируем команду
                 if (command) {
                     if (command.toLowerCase() === 'clear') {
                         console.log("Очистка вывода"); // Логируем очистку
                         outputElement.innerHTML = '';
-                    } else if (command.toLowerCase() === 'screen') {
-                        // Переключаемся на канвас
-                        outputElement.style.display = 'none';
-                        inputElement.style.display = 'none';
-                        canvasContainer.style.display = 'block';
-                        updateCanvas(); // Обновляем канвас
-                    } else {
+                    }
+
+                    else {
                         Module.print("> " + command);
                         if (Module.ccall) {
                             console.log("Вызов processInput с командой:", command); // Логируем вызов
@@ -221,13 +259,19 @@
                                 ['string'],
                                 [command]
                             );
+
                         } else {
                             console.error("Module.ccall не доступен!"); // Логируем ошибку
                         }
+
+                        loop();
+
                     }
                     inputElement.value = '';
                 }
             }
+
+
         });
 
         window.addEventListener('resize', () => {
@@ -238,9 +282,21 @@
                     null,
                     ['number', 'number'],
                     [width, height]
+
                 );
+
+                console.log("set size!");
+                updateCanvas();
+
+                mode = Module._getMode();
+                console.log(mode);
+                loop();
+
             }
+
         });
+
+
     </script>
     <script async type="text/javascript" src="main.js"></script>
 </body>

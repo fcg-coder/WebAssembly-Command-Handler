@@ -8,11 +8,12 @@ std::ostream jsCout(&jsStreamBuffer);
 
 InputOutputHandler* InputOutputHandler::m_instance = nullptr;
 InputOutputHandler* IOH = InputOutputHandler::getInstance();
+InputOutputMode InputOutputHandler::mode = InputOutputMode::SHELL;
+extern "C" EMSCRIPTEN_KEEPALIVE InputOutputMode getMode()
+{
 
-// extern "C" EMSCRIPTEN_KEEPALIVE InputOutputHandler* getApp()
-// {
-//     return InputOutputHandler::getInstance();
-// }
+    return InputOutputHandler::getInstance()->mode;
+}
 
 extern "C" EMSCRIPTEN_KEEPALIVE uint32_t* getScreen()
 {
