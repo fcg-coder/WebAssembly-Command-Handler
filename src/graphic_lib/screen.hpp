@@ -2,11 +2,11 @@
 #include <cstdint>
 #include <cstdio>
 #include "../main.hpp"
-
+#include <random>
 #define MAX_WIDTH 1920
 #define MAX_HEIGH 1080
 
-#define MAX_SIZE (MAX_WIDTH * MAX_WIDTH)
+#define MAX_SIZE (MAX_HEIGH * MAX_WIDTH)
 
 /**
  * @brief pixels as RGBA: 0xRRGGBBAA format
@@ -61,6 +61,37 @@ private:
     static int m_windowHeight;
     static int m_windowWidth;
 
+    /***
+     * @brief
+     *
+     *
+     * T O - D O :
+     *  - SIMD render
+     */
+    void render()
+    {
+        const int width = m_windowWidth;
+        const int height = m_windowHeight;
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_real_distribution<float> dither(-0.5f, 0.5f);
+
+        for (int y = 0; y < height; y++)
+        {
+
+            for (int x = 0; x < width; x++)
+            {
+
+                float t = static_cast<float>(x + y) / (width + height);
+                uint8_t red = static_cast<uint8_t>(t * 255);
+                uint8_t green = static_cast<uint8_t>((1.0f - t) * 255);
+                Pixel pixel(static_cast<uint8_t>(t * 255), static_cast<uint8_t>(t * 255), static_cast<uint8_t>(t * 255), static_cast<uint8_t>(t * 255));
+
+                screenBuff[y * width + x] = pixel.serialize();
+            }
+        }
+    }
+
 public:
     uint32_t screenBuff[MAX_SIZE];
     static Screen* getInstance()
@@ -73,26 +104,9 @@ public:
     }
     uint32_t* getScreen()
     {
-        updateScreen();
+        render();
         return screenBuff;
     }
 
     void setSize(int h, int w);
-
-    void updateScreen()
-    {
-        int pixel_ = 0;
-        for (int i = 0; i < m_windowHeight; i++)
-        {
-
-            for (int j = 0; j < m_windowWidth; j++)
-            {
-                float color = i + j / m_windowWidth * m_windowHeight;
-
-                Pixel pixel(static_cast<uint8_t>(color), static_cast<uint8_t>(color), static_cast<uint8_t>(color), static_cast<uint8_t>(255));
-                screenBuff[pixel_] = pixel.serialize();
-                pixel_++;
-            }
-        }
-    }
 };
