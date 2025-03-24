@@ -3,7 +3,7 @@
 Screen* Screen::m_instance = nullptr;
 extern InputOutputHandler* IOH;
 
-int Screen::m_windowHeight = MAX_HEIGH;
+int Screen::m_windowHeight = MAX_HEIGHT;
 int Screen::m_windowWidth = MAX_WIDTH;
 
 void Screen::setSize(int h, int w)
