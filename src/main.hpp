@@ -51,7 +51,6 @@ protected:
     }
 };
 
-// Объявления глобальных переменных
 extern JSStreamBuffer jsStreamBuffer;
 extern std::ostream jsCout;
 

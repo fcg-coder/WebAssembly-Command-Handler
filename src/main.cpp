@@ -1,8 +1,5 @@
 #include "main.hpp"
 
-// std::atomic<bool> running(true);
-
-// Override print function
 JSStreamBuffer jsStreamBuffer;
 std::ostream jsCout(&jsStreamBuffer);
 
@@ -17,8 +14,10 @@ extern "C" EMSCRIPTEN_KEEPALIVE InputOutputMode getMode()
 
 extern "C" EMSCRIPTEN_KEEPALIVE uint32_t* getScreen()
 {
-
-    return Screen::getInstance()->getScreen();
+    if (InputOutputHandler::getInstance()->mode == InputOutputMode::SCREEN)
+    {
+        return Screen::getInstance()->getScreen();
+    }
 }
 
 extern "C" EMSCRIPTEN_KEEPALIVE void printToJS(const char* text)
