@@ -12,14 +12,38 @@ This project is a C++ application using WebAssembly (Emscripten) that enables co
 ## Project Structure
 
 ```
-webAsm/
-├── src/
-│   ├── main.cpp                
-│   ├── main.hpp                
-│   ├── command_handler/
-│   │   ├── command_handler.cpp  
-│   │   ├── command_handler.hpp  
-├── CMakeLists.txt              
-└── README.md                   
+.
+├── docker-compose.yaml
+├── Dockerfile
+├── docs
+│   └── uml.drawio.png
+├── page
+│   ├── ByteBounce.ttf
+│   ├── index.html
+│   ├── styles.css
+│   └── webasm.js
+├── README.md
+├── server.py
+└── src
+    ├── CMakeLists.txt
+    ├── command_handler
+    │   ├── CMakeLists.txt
+    │   ├── command_handler.cpp
+    │   ├── command_handler.hpp
+    │   └── commands
+    │       ├── CMakeLists.txt
+    │       ├── commands.cpp
+    │       └── commands.hpp
+    ├── graphic_lib
+    │   ├── CMakeLists.txt
+    │   ├── screen.cpp
+    │   ├── screen.hpp
+    │   └── shapes
+    │       ├── CMakeLists.txt
+    │       ├── shapes.cpp
+    │       └── shapes.hpp
+    ├── main.cpp
+    ├── main.hpp
+    └── README.md
 ```
 

@@ -1,0 +1,61 @@
+@font-face {
+    font-family: 'ByteBounce';
+    src: url('ByteBounce.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+html {
+    font-family: ByteBounce, Arial;
+}
+
+body {
+    background-color: black;
+    color: white;
+    font-size: 200%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+    line-height: 1;
+}
+
+#output {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    flex-grow: 1;
+    padding: 10px;
+    overflow-y: auto;
+}
+
+#input {
+    width: 100%;
+    background-color: black;
+    color: white;
+    border: none;
+    font-family: monospace;
+    font-size: 1em;
+    padding: 10px;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.hidden {
+    display: none;
+}
+
+#canvas {
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+    border: 1px solid white;
+}
+
+#canvas-container {
+    display: none;
+    width: 100%;
+    height: 100%;
+}

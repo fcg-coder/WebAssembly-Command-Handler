@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cpp_WebAsm</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="spinner" id="spinner"></div>
+    <div class="emscripten" id="status">Downloading...</div>
+    <div class="emscripten">
+        <progress value="0" max="100" id="progress" class="hidden"></progress>
+    </div>
+    <div id="canvas-container">
+        <canvas id="canvas" oncontextmenu="event.preventDefault()" tabindex="-1"></canvas>
+    </div>
+    <div id="output"></div>
+    <input id="input" type="text" style="font-family: ByteBounce, Arial" placeholder="Type the command and press Enter">
+
+    <script async type="text/javascript" src="webasm.js"></script>
+    <script async type="text/javascript" src="main.js"></script>
+</body>
+
+</html>
