@@ -11,39 +11,40 @@ This project is a C++ application using WebAssembly (Emscripten) that enables co
 
 ## Project Structure
 
-```
+ 
+```sh
 .
-├── docker-compose.yaml
-├── Dockerfile
+├── docker-compose.yaml                     # Docker Compose configuration.
+├── Dockerfile                              # Docker image build instructions.
 ├── docs
-│   └── uml.drawio.png
+│   └── uml.drawio.png                      # Project architecture diagram.
 ├── page
-│   ├── ByteBounce.ttf
-│   ├── index.html
-│   ├── styles.css
-│   └── webasm.js
-├── README.md
-├── server.py
+│   ├── ByteBounce.ttf                      # Custom font.
+│   ├── index.html                          # Web interface HTML.
+│   ├── styles.css                          # Web interface styles.
+│   └── webasm.js                           # WebAssembly interaction script.
+├── README.md                               # Project overview.
+├── server.py                               # Web application server.
 └── src
-    ├── CMakeLists.txt
+    ├── CMakeLists.txt                      # Source directory build configuration.
     ├── command_handler
-    │   ├── CMakeLists.txt
-    │   ├── command_handler.cpp
-    │   ├── command_handler.hpp
+    │   ├── CMakeLists.txt                  # Command handler build configuration.
+    │   ├── command_handler.cpp             # Command handler implementation.
+    │   ├── command_handler.hpp             # Command handler header.
     │   └── commands
-    │       ├── CMakeLists.txt
-    │       ├── commands.cpp
-    │       └── commands.hpp
+    │       ├── CMakeLists.txt              # Commands module build configuration.
+    │       ├── commands.cpp                # Commands implementation.
+    │       └── commands.hpp                # Commands header.
     ├── graphic_lib
-    │   ├── CMakeLists.txt
-    │   ├── screen.cpp
-    │   ├── screen.hpp
+    │   ├── CMakeLists.txt                  # Graphics library build configuration.
+    │   ├── screen.cpp                      # Screen rendering implementation.
+    │   ├── screen.hpp                      # Screen rendering header.
     │   └── shapes
-    │       ├── CMakeLists.txt
-    │       ├── shapes.cpp
-    │       └── shapes.hpp
-    ├── main.cpp
-    ├── main.hpp
-    └── README.md
+    │       ├── CMakeLists.txt              # Shapes module build configuration.
+    │       ├── shapes.cpp                  # Shapes implementation.
+    │       └── shapes.hpp                  # Shapes header.
+    ├── main.cpp                            # Application entry point.
+    ├── main.hpp                            # Main logic header.
+    └── README.md                           # Source directory documentation.
 ```
-
+ 

@@ -8,9 +8,7 @@ DIRECTORY = "build"
 class Handler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=DIRECTORY, **kwargs)
-
     def guess_type(self, path):
-        # Кастомные MIME-типы
         if path.endswith(".wasm"):
             return "application/wasm"
         return super().guess_type(path)
