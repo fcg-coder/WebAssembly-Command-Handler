@@ -1,4 +1,5 @@
 #include "commands.hpp"
+#include "../../graphic_lib/screen.hpp"
 
 extern InputOutputHandler* IOH;
 
@@ -52,4 +53,12 @@ void CommandScreen::execute()
 void CommandShell::execute()
 {
     IOH->mode = InputOutputMode::SHELL;
+}
+
+void CommandRotateCube::execute()
+{
+    double angle = 3.0 * M_PI / 180.0;
+    Screen::getInstance()->cube.rotateX(angle);
+    Screen::getInstance()->cube.rotateY(angle);
+    Screen::getInstance()->cube.rotateZ(angle);
 }

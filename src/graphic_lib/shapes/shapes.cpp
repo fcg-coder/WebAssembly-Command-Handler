@@ -9,16 +9,22 @@ void ShapeBase::line(int x0, int y0, int x1, int y1, const Color& color)
     int sx = x0 < x1 ? 1 : -1;
     int sy = y0 < y1 ? 1 : -1;
     int err = dx - dy;
+    int prevX = -1, prevY = -1;
 
     while (true)
     {
         if (x0 >= 0 && x0 < Screen::getInstance()->getSize().first &&
             y0 >= 0 && y0 < Screen::getInstance()->getSize().second)
         {
-            Pixel pixel(color.red, color.green, color.blue, color.alpha);
-            pixel.x = x0;
-            pixel.y = y0;
-            Screen::getInstance()->addShape(pixel, this->layoutIndex);
+            if (x0 != prevX || y0 != prevY)
+            {
+                Pixel pixel(color.red, color.green, color.blue, color.alpha);
+                pixel.x = x0;
+                pixel.y = y0;
+                Screen::getInstance()->addShape(pixel, this->layoutIndex);
+                prevX = x0;
+                prevY = y0;
+            }
         }
 
         if (x0 == x1 && y0 == y1)
@@ -74,4 +80,25 @@ void Square::render()
 
     line(centerX - half, centerY - half, centerX - half, centerY + half, borderColor);
     line(centerX + half, centerY - half, centerX + half, centerY + half, borderColor);
+}
+
+void Cube::render()
+{
+
+    Color cubeColor = Color(255, 255, 255);
+
+    line3D(points[0], points[1], cubeColor);
+    line3D(points[1], points[2], cubeColor);
+    line3D(points[2], points[3], cubeColor);
+    line3D(points[3], points[0], cubeColor);
+
+    line3D(points[4], points[5], cubeColor);
+    line3D(points[5], points[6], cubeColor);
+    line3D(points[6], points[7], cubeColor);
+    line3D(points[7], points[4], cubeColor);
+
+    line3D(points[0], points[4], cubeColor);
+    line3D(points[1], points[5], cubeColor);
+    line3D(points[2], points[6], cubeColor);
+    line3D(points[3], points[7], cubeColor);
 }

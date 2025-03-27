@@ -36,3 +36,9 @@ class CommandDrawSquare : public CommandBase
 public:
     void execute() override;
 };
+
+class CommandRotateCube : public CommandBase
+{
+public:
+    void execute() override;
+};

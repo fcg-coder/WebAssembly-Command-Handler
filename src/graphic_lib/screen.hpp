@@ -152,6 +152,7 @@ private:
     }
 
 public:
+    Cube cube;
     uint32_t screenBuff[MAX_SIZE];
 
     static Screen* getInstance()
@@ -167,10 +168,10 @@ public:
     {
         clearScreen();
 
-        Gradient obj1;
-        obj1.render();
-        Square obj;
-        obj.render();
+        // Gradient obj1;
+        // obj1.render();
+
+        cube.render();
 
         render();
         return screenBuff;
