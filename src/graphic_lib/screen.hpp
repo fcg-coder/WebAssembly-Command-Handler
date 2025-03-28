@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <cstdio>
 #include "../main.hpp"
+#include "shapes/shape_base.hpp"
 #include "shapes/shapes.hpp"
 #include <random>
 #include <utility>
@@ -168,8 +169,8 @@ public:
     {
         clearScreen();
 
-        // Gradient obj1;
-        // obj1.render();
+        CoordinateSystem obj1;
+        obj1.render();
 
         cube.render();
 
@@ -190,11 +191,7 @@ public:
         }
     }
 
-    void setSize(int h, int w)
-    {
-        m_windowHeight = h;
-        m_windowWidth = w;
-    }
+    void setSize(int h, int w);
 
     std::pair<int, int> getSize()
     {

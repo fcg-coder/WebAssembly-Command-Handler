@@ -2,49 +2,7 @@
 #include "shapes.hpp"
 
 extern InputOutputHandler* IOH;
-std::pair<int, int> (Point3D::*Point3D::projectionMethod)() = nullptr;
 
-void ShapeBase::line(int x0, int y0, int x1, int y1, const Color& color)
-{
-    int dx = abs(x1 - x0);
-    int dy = abs(y1 - y0);
-    int sx = x0 < x1 ? 1 : -1;
-    int sy = y0 < y1 ? 1 : -1;
-    int err = dx - dy;
-    int prevX = -1, prevY = -1;
-
-    while (true)
-    {
-        if (x0 >= 0 && x0 < Screen::getInstance()->getSize().first &&
-            y0 >= 0 && y0 < Screen::getInstance()->getSize().second)
-        {
-            if (x0 != prevX || y0 != prevY)
-            {
-                Pixel pixel(color.red, color.green, color.blue, color.alpha);
-                pixel.x = x0;
-                pixel.y = y0;
-                Screen::getInstance()->addShape(pixel, this->layoutIndex);
-                prevX = x0;
-                prevY = y0;
-            }
-        }
-
-        if (x0 == x1 && y0 == y1)
-            break;
-
-        int e2 = 2 * err;
-        if (e2 > -dy)
-        {
-            err -= dy;
-            x0 += sx;
-        }
-        if (e2 < dx)
-        {
-            err += dx;
-            y0 += sy;
-        }
-    }
-}
 void Gradient::render()
 {
     auto [width, height] = Screen::getInstance()->getSize();
@@ -84,27 +42,67 @@ void Square::render()
     line(centerX + half, centerY - half, centerX + half, centerY + half, borderColor);
 }
 
+Cube::Cube()
+{
+    int size = 250;
+    int offsetX = 500; // Center offset on the X-axis
+    int offsetY = 500; // Center offset on the Y-axis
+    int offsetZ = 500; // Center offset on the Z-axis
+
+    points = {
+        new Point3D(-size + offsetX, -size + offsetY, size + offsetZ),
+        new Point3D(size + offsetX, -size + offsetY, size + offsetZ),
+        new Point3D(size + offsetX, size + offsetY, size + offsetZ),
+        new Point3D(-size + offsetX, size + offsetY, size + offsetZ),
+        new Point3D(-size + offsetX, -size + offsetY, -size + offsetZ),
+        new Point3D(size + offsetX, -size + offsetY, -size + offsetZ),
+        new Point3D(size + offsetX, size + offsetY, -size + offsetZ),
+        new Point3D(-size + offsetX, size + offsetY, -size + offsetZ)};
+
+    layoutIndex = 1;
+}
+
 void Cube::render()
 {
     Point3D::setProjectionMethod(&Point3D::perspectiveProjection);
-    double angle = 3.0 * M_PI / 180.0;
+    // Point3D::setProjectionMethod(&Point3D::orthographicProjection);
+    double angle = 2.0 * M_PI / 180.0;
     rotateX(angle);
     rotateY(angle);
     rotateZ(angle);
-    Color cubeColor = Color(255, 255, 255);
 
-    line3D(points[0], points[1], cubeColor);
-    line3D(points[1], points[2], cubeColor);
-    line3D(points[2], points[3], cubeColor);
-    line3D(points[3], points[0], cubeColor);
+    line3D(points[0], points[1], Color::White());
+    line3D(points[1], points[2], Color::White());
+    line3D(points[2], points[3], Color::White());
+    line3D(points[3], points[0], Color::White());
 
-    line3D(points[4], points[5], cubeColor);
-    line3D(points[5], points[6], cubeColor);
-    line3D(points[6], points[7], cubeColor);
-    line3D(points[7], points[4], cubeColor);
+    line3D(points[4], points[5], Color::White());
+    line3D(points[5], points[6], Color::White());
+    line3D(points[6], points[7], Color::White());
+    line3D(points[7], points[4], Color::White());
 
-    line3D(points[0], points[4], cubeColor);
-    line3D(points[1], points[5], cubeColor);
-    line3D(points[2], points[6], cubeColor);
-    line3D(points[3], points[7], cubeColor);
+    line3D(points[0], points[4], Color::White());
+    line3D(points[1], points[5], Color::White());
+    line3D(points[2], points[6], Color::White());
+    line3D(points[3], points[7], Color::White());
+}
+
+CoordinateSystem::CoordinateSystem()
+{
+
+    points = {
+        new Point3D(0, 0, 0),
+        new Point3D(1000, 0, 0),
+        new Point3D(0, 1000, 0),
+        new Point3D(0, 0, 10000000)};
+    layoutIndex = 998;
+}
+
+void CoordinateSystem::render()
+{
+    Point3D::setProjectionMethod(&Point3D::perspectiveProjection);
+
+    line3D(points[0], points[1], Color::Gray()); // X-axis
+    line3D(points[0], points[2], Color::Gray()); // Y-axis
+    line3D(points[0], points[3], Color::Gray()); // Z-axis
 }
