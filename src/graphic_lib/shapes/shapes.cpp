@@ -2,6 +2,8 @@
 #include "shapes.hpp"
 
 extern InputOutputHandler* IOH;
+std::pair<int, int> (Point3D::*Point3D::projectionMethod)() = nullptr;
+
 void ShapeBase::line(int x0, int y0, int x1, int y1, const Color& color)
 {
     int dx = abs(x1 - x0);
@@ -84,7 +86,11 @@ void Square::render()
 
 void Cube::render()
 {
-
+    Point3D::setProjectionMethod(&Point3D::perspectiveProjection);
+    double angle = 3.0 * M_PI / 180.0;
+    rotateX(angle);
+    rotateY(angle);
+    rotateZ(angle);
     Color cubeColor = Color(255, 255, 255);
 
     line3D(points[0], points[1], cubeColor);

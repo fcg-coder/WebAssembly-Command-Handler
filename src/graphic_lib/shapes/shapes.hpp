@@ -34,14 +34,40 @@ public:
     int y;
     int z;
 
-    Point3D(int x, int y, int z) : x(x), y(y), z(z) {}
-    Point3D() : x(0), y(0), z(0) {}
+    Point3D(int x, int y, int z)
+        : x(x), y(y), z(z) {}
+    Point3D()
+        : x(0), y(0), z(0) {}
+
+    static std::pair<int, int> (Point3D::*projectionMethod)();
+
+    static void setProjectionMethod(std::pair<int, int> (Point3D::*func)())
+    {
+        projectionMethod = func;
+    }
 
     std::pair<int, int> projection()
+    {
+        return (this->*projectionMethod)();
+    }
+
+    /***
+     * @brief Projects the 3D point onto a 2D plane using PERSPECTIVE PROJECTION.
+     * @return A pair of integers representing the projected x and y coordinates.
+     */
+    std::pair<int, int> perspectiveProjection()
     {
         int projectedX = (x * VIEWER_DISTANCE) / (z + VIEWER_DISTANCE);
         int projectedY = (y * VIEWER_DISTANCE) / (z + VIEWER_DISTANCE);
         return {projectedX, projectedY};
+    }
+
+    /***
+     * @brief
+     */
+    std::pair<int, int> orthographicProjection()
+    {
+        return {x, y + 5};
     }
 };
 
