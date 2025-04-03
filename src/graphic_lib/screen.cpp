@@ -11,8 +11,13 @@ void Screen::setSize(int h, int w)
 {
     m_windowHeight = h;
     m_windowWidth = w;
-    char buffer[50];
+    char buffer[60];
+#if defined(SIMD) && defined(__wasm_simd128__)
+    std::snprintf(buffer, sizeof(buffer), "Set screen:  Width %d pix, Height %d pix with SIMD", m_windowWidth, m_windowHeight);
+#else
     std::snprintf(buffer, sizeof(buffer), "Set screen:  Width %d pix, Height %d pix", m_windowWidth, m_windowHeight);
+#endif
+
     IOH->output(buffer);
 }
 

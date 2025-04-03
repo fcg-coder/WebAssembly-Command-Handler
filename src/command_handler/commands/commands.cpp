@@ -24,4 +24,5 @@ void CommandRotateCube::execute()
     dynamic_cast<ShapeBase3D*>(Screen::getInstance()->getObject("cube"))->rotateX(angle);
     dynamic_cast<ShapeBase3D*>(Screen::getInstance()->getObject("cube"))->rotateY(angle);
     dynamic_cast<ShapeBase3D*>(Screen::getInstance()->getObject("cube"))->rotateZ(angle);
+ 
 }

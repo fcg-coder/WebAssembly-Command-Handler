@@ -7,6 +7,11 @@
 #include <random>
 #include <utility>
 
+#ifdef SIMD
+#    include <wasm_simd128.h>
+
+#endif
+
 #define MAX_WIDTH  1920
 #define MAX_HEIGHT 1080
 
@@ -133,6 +138,35 @@ private:
 
         std::fill_n(screenBuff, (buffer_size <= MAX_SIZE) ? buffer_size : MAX_SIZE, 0x00000000);
 
+// this is shit but simd
+// https://emscripten.org/docs/porting/simd.html
+#if defined(SIMD) && defined(__wasm_simd128__)
+#    include <wasm_simd128.h>
+
+        for (int y = 0; y < current_height; ++y)
+        {
+            int x = 0;
+
+            for (; x <= current_width - 4; x += 4)
+            {
+                const int index = y * current_width + x;
+
+                v128_t pixel_data = wasm_u32x4_make(
+                    pixels[y][x + 3].serialize(),
+                    pixels[y][x + 2].serialize(),
+                    pixels[y][x + 1].serialize(),
+                    pixels[y][x].serialize());
+
+                wasm_v128_store(&screenBuff[index], pixel_data);
+            }
+
+            for (; x < current_width; ++x)
+            {
+                const int index = y * current_width + x;
+                screenBuff[index] = pixels[y][x].serialize();
+            }
+        }
+#else
         for (int y = 0; y < current_height; ++y)
         {
             for (int x = 0; x < current_width; ++x)
@@ -144,6 +178,7 @@ private:
                 }
             }
         }
+#endif
     }
 
     void clearScreen()
