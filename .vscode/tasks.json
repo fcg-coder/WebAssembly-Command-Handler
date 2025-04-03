@@ -7,7 +7,7 @@
             "command": "rm -rf build && docker-compose down && docker-compose up --build",
             "group": {
                 "kind": "build",
-                "isDefault": true
+                
             },
             "problemMatcher": [],
             "isBackground": false,
@@ -22,7 +22,7 @@
             "command": "source ~/emsdk/emsdk_env.sh && rm -rf build && mkdir -p build && emcmake cmake -S src -B build && emmake cmake --build build && cp page/index.html page/ByteBounce.ttf page/styles.css page/webasm.js build/",
             "group": {
                 "kind": "build",
-                "isDefault": false
+              
             },
             "problemMatcher": [],
             "isBackground": false,
@@ -49,7 +49,7 @@
         {
             "label": "Static Analysis: Run Cppcheck",
             "type": "shell",
-            "command": "cppcheck --enable=all  . 2> report.txt && cat report.txt",
+            "command": "cppcheck --suppress=unusedFunction --enable=all  . 2> report.txt && cat report.txt",
             "problemMatcher": []
         }
 
@@ -58,10 +58,7 @@
             "label": "Clean: Remove Build Directory",
             "type": "shell",
             "command": "rm -rf build",
-            "group": {
-                "kind": "build",
-                "isDefault": false
-            },
+             
             "problemMatcher": [],
             "runOptions": {
                 "reevaluateOnRerun": true,
