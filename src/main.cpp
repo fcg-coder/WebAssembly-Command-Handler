@@ -18,6 +18,7 @@ extern "C" EMSCRIPTEN_KEEPALIVE uint32_t* getScreen()
     {
         return Screen::getInstance()->getScreen();
     }
+    return 0;
 }
 
 extern "C" EMSCRIPTEN_KEEPALIVE void printToJS(const char* text)

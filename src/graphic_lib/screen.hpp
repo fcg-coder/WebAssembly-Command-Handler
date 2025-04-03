@@ -70,7 +70,7 @@ public:
     Pixel(int x, int y, uint8_t red = 0, uint8_t green = 0, uint8_t blue = 0, uint8_t alpha = 255)
         : x(x), y(y), m_color(red, green, blue, alpha) {}
 
-    Pixel(const Color& color, int x = 0, int y = 0)
+    explicit Pixel(const Color& color, int x = 0, int y = 0)
         : m_color(color), x(x), y(y) {}
 
     uint32_t serialize() const
@@ -104,6 +104,11 @@ private:
             {
                 pixels[y][x] = Pixel(x, y, 0, 0, 0, 0);
                 layoutIndices[y][x] = -1;
+                const int index = y * MAX_WIDTH + x;
+                if (index < MAX_SIZE)
+                {
+                    screenBuff[index] = pixels[y][x].serialize();
+                }
             }
         }
     }
