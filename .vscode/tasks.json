@@ -2,7 +2,7 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Build and run Docker container",
+            "label": "Docker: Build and Run Container",
             "type": "shell",
             "command": "rm -rf build && docker-compose down && docker-compose up --build",
             "group": {
@@ -17,12 +17,12 @@
             }
         },
         {
-            "label": "Build CMake",
+            "label": "CMake: Build Project",
             "type": "shell",
-            "command": "source ~/emsdk/emsdk_env.sh && rm -rf build &&  mkdir -p build &&  emcmake cmake -S src  -B build && emmake cmake --build build && cp page/index.html page/ByteBounce.ttf page/styles.css page/webasm.js build/",
+            "command": "source ~/emsdk/emsdk_env.sh && rm -rf build && mkdir -p build && emcmake cmake -S src -B build && emmake cmake --build build && cp page/index.html page/ByteBounce.ttf page/styles.css page/webasm.js build/",
             "group": {
                 "kind": "build",
-                "isDefault": true
+                "isDefault": false
             },
             "problemMatcher": [],
             "isBackground": false,
@@ -32,7 +32,7 @@
             }
         },
         {
-            "label": "Start Local Server",
+            "label": "Server: Start Local Server",
             "type": "shell",
             "command": "python3 server.py",
             "group": {
@@ -45,6 +45,28 @@
                 "reevaluateOnRerun": true,
                 "promptOnClose": false
             }
+        },
+        {
+            "label": "Static Analysis: Run Cppcheck",
+            "type": "shell",
+            "command": "cppcheck --enable=all  . 2> report.txt && cat report.txt",
+            "problemMatcher": []
         }
-    ],
+
+        ,
+        {
+            "label": "Clean: Remove Build Directory",
+            "type": "shell",
+            "command": "rm -rf build",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "problemMatcher": [],
+            "runOptions": {
+                "reevaluateOnRerun": true,
+                "promptOnClose": false
+            }
+        }
+    ]
 }
