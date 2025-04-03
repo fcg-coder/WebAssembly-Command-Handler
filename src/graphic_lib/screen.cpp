@@ -15,3 +15,16 @@ void Screen::setSize(int h, int w)
     std::snprintf(buffer, sizeof(buffer), "Set screen:  Width %d pix, Height %d pix", m_windowWidth, m_windowHeight);
     IOH->output(buffer);
 }
+
+void Screen::addObject(const std::string& key, ShapeBase* shape)
+{
+    std::string _output = "Add object " + key + " to the scene";
+    IOH->output(_output);
+    m_scene[key] = shape;
+}
+
+void Screen::initializeScene()
+{
+    addObject("coordinate_system", new CoordinateSystem());
+    addObject("cube", new Cube());
+}

@@ -34,6 +34,7 @@ class Square : public ShapeBase
 public:
     Square()
     {
+        
         layoutIndex = 2;
     }
     void render() override;

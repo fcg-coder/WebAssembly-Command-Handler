@@ -21,7 +21,7 @@ void CommandShell::execute()
 void CommandRotateCube::execute()
 {
     double angle = 3.0 * M_PI / 180.0;
-    Screen::getInstance()->cube.rotateX(angle);
-    Screen::getInstance()->cube.rotateY(angle);
-    Screen::getInstance()->cube.rotateZ(angle);
+    dynamic_cast<ShapeBase3D*>(Screen::getInstance()->getObject("cube"))->rotateX(angle);
+    dynamic_cast<ShapeBase3D*>(Screen::getInstance()->getObject("cube"))->rotateY(angle);
+    dynamic_cast<ShapeBase3D*>(Screen::getInstance()->getObject("cube"))->rotateZ(angle);
 }

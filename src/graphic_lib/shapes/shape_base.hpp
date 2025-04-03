@@ -8,6 +8,13 @@ class Screen;
 class Pixel;
 class Point3D;
 struct Color;
+
+enum class ShapeMode
+{
+    OFF,
+    ON
+};
+
 /**
  * @brief 2D shape base class
  *
@@ -16,6 +23,7 @@ class ShapeBase
 {
 public:
     int layoutIndex;
+    ShapeMode mode = ShapeMode::OFF; // Default value set to OFF
     virtual void render() = 0;
     virtual ~ShapeBase() = default;
 

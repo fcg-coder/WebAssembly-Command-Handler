@@ -44,6 +44,7 @@ void Square::render()
 
 Cube::Cube()
 {
+
     int size = 250;
     int offsetX = 500; // Center offset on the X-axis
     int offsetY = 500; // Center offset on the Y-axis
@@ -60,6 +61,8 @@ Cube::Cube()
         new Point3D(-size + offsetX, size + offsetY, -size + offsetZ)};
 
     layoutIndex = 1;
+
+    mode = ShapeMode::ON;
 }
 
 void Cube::render()
@@ -96,6 +99,8 @@ CoordinateSystem::CoordinateSystem()
         new Point3D(0, 1000, 0),
         new Point3D(0, 0, 10000000)};
     layoutIndex = 998;
+
+    mode = ShapeMode::ON;
 }
 
 void CoordinateSystem::render()

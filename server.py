@@ -16,3 +16,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 with socketserver.TCPServer(("", PORT), Handler) as httpd:
     print(f"Serving on http://localhost:{PORT}")
     httpd.serve_forever()
+    
+    
+### RUN  nohup python3 server.py &> server.log &

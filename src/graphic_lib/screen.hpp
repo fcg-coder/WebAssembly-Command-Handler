@@ -96,6 +96,8 @@ public:
 class Screen
 {
 private:
+    void initializeScene();
+
     Screen()
     {
         for (int y = 0; y < MAX_HEIGHT; ++y)
@@ -111,11 +113,13 @@ private:
                 }
             }
         }
+        initializeScene();
     }
 
+    // Cube cube;
     static Screen* m_instance;
-
-    Pixel pixels[MAX_HEIGHT][MAX_WIDTH]; // PIXELS ON SCREEN
+    std::map<std::string, ShapeBase*> m_scene; // map of objects with string keys
+    Pixel pixels[MAX_HEIGHT][MAX_WIDTH];       // PIXELS ON SCREEN
     int layoutIndices[MAX_HEIGHT][MAX_WIDTH];
 
     static int m_windowHeight;
@@ -158,7 +162,6 @@ private:
     }
 
 public:
-    Cube cube;
     uint32_t screenBuff[MAX_SIZE];
 
     static Screen* getInstance()
@@ -173,16 +176,25 @@ public:
     uint32_t* getScreen()
     {
         clearScreen();
+        if (m_windowHeight > MAX_HEIGHT || m_windowWidth > MAX_WIDTH)
+        {
+            return nullptr;
+        }
+        for (auto& [key, shape] : m_scene)
+        {
+            if (shape && shape->mode == ShapeMode::ON)
+            {
+                shape->render(); // render the object
+            }
+        }
 
-        CoordinateSystem obj1;
-        obj1.render();
-
-        cube.render();
-
-        render();
+        render(); // render all screen
         return screenBuff;
     }
 
+    /**
+     * @brief Add a PIXELS to the pixels array. Usually used for lines and points.
+     */
     void addShape(Pixel p, int layoutIndex)
     {
         if (p.x >= 0 && p.x < m_windowWidth && p.y >= 0 && p.y < m_windowHeight)
@@ -197,6 +209,32 @@ public:
     }
 
     void setSize(int h, int w);
+
+    /**
+     * @brief Add an object to the scene with a string key.
+     *
+     * Used to switch on/off the object's rendering in the future.
+     */
+    void addObject(const std::string& key, ShapeBase* shape);
+
+    /**
+     * @brief Remove an object from the scene by its string key.
+     */
+    void removeObject(const std::string& key)
+    {
+        m_scene.erase(key);
+    }
+
+    /**
+     * @brief Get an object from the scene by its string key.
+     *
+     * @return Pointer to the ShapeBase object, or nullptr if not found.
+     */
+    ShapeBase* getObject(const std::string& key) const
+    {
+        auto it = m_scene.find(key);
+        return (it != m_scene.end()) ? it->second : nullptr;
+    }
 
     std::pair<int, int> getSize()
     {
