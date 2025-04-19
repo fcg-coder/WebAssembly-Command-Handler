@@ -152,10 +152,10 @@ private:
                 const int index = y * current_width + x;
 
                 v128_t pixel_data = wasm_u32x4_make(
-                    pixels[y][x + 3].serialize(),
-                    pixels[y][x + 2].serialize(),
+                    pixels[y][x].serialize(),
                     pixels[y][x + 1].serialize(),
-                    pixels[y][x].serialize());
+                    pixels[y][x + 2].serialize(),
+                    pixels[y][x + 3].serialize());
 
                 wasm_v128_store(&screenBuff[index], pixel_data);
             }
