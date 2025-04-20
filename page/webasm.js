@@ -144,12 +144,7 @@ const startMainLoop = () => {
         // Логируем информацию о нажатой клавише
         console.log(`Key pressed: ${event.key} (code: ${event.code})`);
         
-        // Проверяем, инициализирован ли модуль WASM
-        if (!Module || !Module._menuMoveUp || !Module._menuMoveDown) {
-            console.warn('WASM module or menu functions not initialized');
-            return;
-        }
-    
+       
         // Обрабатываем только нужные клавиши
         document.addEventListener('keydown', (event) => {
             switch(event.key) {
