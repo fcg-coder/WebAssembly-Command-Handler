@@ -17,12 +17,19 @@ public:
     Menu(const std::string& question, const std::vector<std::string>& options);
     void moveUp();
     void moveDown();
+    void pressEnter();
+
     std::string render() const;
 
     static Menu* getCurrentInstance()
     {
         return m_currentInstance.get();
     }
+
+    Menu(const Menu&) = delete;
+    Menu& operator=(const Menu&) = delete;
+
+    static void destroyInstance();
 
     int getSelected() const;
 };

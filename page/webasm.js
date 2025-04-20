@@ -151,35 +151,58 @@ const startMainLoop = () => {
         }
     
         // Обрабатываем только нужные клавиши
-        switch(event.key) {
-            case 'ArrowUp':
-                console.debug('Processing Up arrow key');
-                try {
-                    Module._menuMoveUp();
-                    console.log('Menu moved up successfully');
-                    event.preventDefault();
-                } catch (e) {
-                    console.error('Error in menuMoveUp:', e);
-                }
-                break;
+        document.addEventListener('keydown', (event) => {
+            switch(event.key) {
+                case 'ArrowUp':
+                    
+                    try {
+                        // Используем ccall для вызова C++ функции
+                        Module.ccall(
+                            'pressButton',  // Имя C++ функции
+                            null,          // Возвращаемый тип (void)
+                            ['string'],    // Типы аргументов (массив)
+                            ['up']         // Аргументы (массив)
+                        );
+                       
+                        event.preventDefault();
+                    } catch (e) {
+                        console.error('Error in pressButton("up"):', e);
+                    }
+                    break;
+        
+                case 'ArrowDown':
+                   
+                    try {
+                        Module.ccall(
+                            'pressButton', 
+                            null, 
+                            ['string'], 
+                            ['down']
+                        );
+                        event.preventDefault();
+                    } catch (e) {
+                        console.error('Error in pressButton("down"):', e);
+                    }
+                    break;
                 
-            case 'ArrowDown':
-                console.debug('Processing Down arrow key');
-                try {
-                    Module._menuMoveDown();
-                    console.log('Menu moved down successfully');
-                    event.preventDefault();
-                } catch (e) {
-                    console.error('Error in menuMoveDown:', e);
-                }
-                break;
-    
-            
-            default:
-                // Логируем необработанные клавиши (уровень debug)
-                console.debug(`Unhandled key: ${event.key}`);
-                return;
-        }
+                case 'Escape':
+                    try {
+                        Module.ccall(
+                            'pressButton', 
+                            null, 
+                            ['string'], 
+                            ['escape']
+                        );
+                        event.preventDefault();
+                    } catch (e) {
+                        console.error('Error in pressButton("down"):', e);
+                    }
+                    break;
+ 
+                default:
+                    break;
+            }
+        });
     
  
         

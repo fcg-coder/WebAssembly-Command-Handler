@@ -45,17 +45,29 @@ extern "C" EMSCRIPTEN_KEEPALIVE void setSize(const int height, const int width)
     Screen::getInstance()->setSize(height, width);
 }
 
-extern "C" EMSCRIPTEN_KEEPALIVE void menuMoveDown()
+extern "C" EMSCRIPTEN_KEEPALIVE void pressButton(const char* _input)
 {
-    Menu::getCurrentInstance()->moveDown();
+    std::string input(_input);
+
+    if (input == "up")
+    {
+        Menu::getCurrentInstance()->moveUp();
+    }
+    else if (input == "down")
+    {
+        Menu::getCurrentInstance()->moveDown();
+    }
+
+    else if (input == "enter")
+    {
+        Menu::getCurrentInstance()->pressEnter();
+    }
+
+    else if (input == "escape")
+    {
+        Menu::destroyInstance();
+    }
 }
-
-extern "C" EMSCRIPTEN_KEEPALIVE void menuMoveUp()
-{
-
-    Menu::getCurrentInstance()->moveUp();
-}
-
 int main()
 {
     std::cout.rdbuf(&jsStreamBuffer);

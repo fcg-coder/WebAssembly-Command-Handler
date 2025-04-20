@@ -1,6 +1,7 @@
 #include "menu.hpp"
 #include <sstream>
 #include <algorithm>
+#include <emscripten.h>
 
 extern InputOutputHandler* IOH;
 
@@ -35,14 +36,24 @@ void Menu::moveUp()
 
 void Menu::moveDown()
 {
-
     if (m_options.empty())
     {
-
         return;
     }
     m_selected = std::clamp(m_selected + 1, 0, static_cast<int>(m_options.size()) - 1);
     m_updateScreen();
+}
+
+void Menu::pressEnter()
+{
+}
+
+void Menu::destroyInstance()
+
+{
+    EM_ASM(
+        document.getElementById('output').innerHTML = '';);
+    m_currentInstance.reset();
 }
 
 int Menu::getSelected() const
@@ -67,9 +78,8 @@ std::string Menu::render() const
     // menu container
     ss << "<div style='"
        << "background-color: #f0f0f0; "
-       << "border-radius: 8px; "
        << "padding: 30px; "
-       << "box-shadow: 0 10px 8px rgba(0,0,0,0.1); "
+       << "box-shadow: 10px  10px 0 rgba(0, 0, 0, 0.1);"
        << "max-width: 80%; "
        << "color: black; "
        << "text-align: center; "
