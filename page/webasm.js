@@ -87,25 +87,28 @@
         elements.input.style.display = isShellMode ? 'block' : 'none';
     };
 
- const mainLoop = () => {
-    if (!state.moduleInitialized) {
-        requestAnimationFrame(mainLoop);
-        return;
-    }
-
-    try {
-        state.mode = Module._getMode();
-        updateUI();
-
-        if (state.mode !== 0) {
-            updateCanvas();
+    const mainLoop = () => {
+        if (!state.moduleInitialized) {
+            requestAnimationFrame(mainLoop);
+            return;
         }
-    } catch (error) {
-        console.error("Loop error:", error);
-    }
-
-    requestAnimationFrame(mainLoop);
-};
+    
+        try {
+            state.mode = Module._getMode();
+            updateUI();
+    
+            if (state.mode !== 0) {
+                updateCanvas();
+            }
+        } catch (error) {
+            console.error("Loop error:", error);
+        }
+    
+        // Задержка перед следующим кадром (≈60 FPS)
+        setTimeout(() => {
+            requestAnimationFrame(mainLoop);
+        }, 1000 / 60); // 16.67 мс
+    };
 
 const startMainLoop = () => {
     if (!isMainLoopRunning) {
@@ -137,6 +140,51 @@ const startMainLoop = () => {
         }
     };
 
+    const handleMenuKeyPress = (event) => {
+        // Логируем информацию о нажатой клавише
+        console.log(`Key pressed: ${event.key} (code: ${event.code})`);
+        
+        // Проверяем, инициализирован ли модуль WASM
+        if (!Module || !Module._menuMoveUp || !Module._menuMoveDown) {
+            console.warn('WASM module or menu functions not initialized');
+            return;
+        }
+    
+        // Обрабатываем только нужные клавиши
+        switch(event.key) {
+            case 'ArrowUp':
+                console.debug('Processing Up arrow key');
+                try {
+                    Module._menuMoveUp();
+                    console.log('Menu moved up successfully');
+                    event.preventDefault();
+                } catch (e) {
+                    console.error('Error in menuMoveUp:', e);
+                }
+                break;
+                
+            case 'ArrowDown':
+                console.debug('Processing Down arrow key');
+                try {
+                    Module._menuMoveDown();
+                    console.log('Menu moved down successfully');
+                    event.preventDefault();
+                } catch (e) {
+                    console.error('Error in menuMoveDown:', e);
+                }
+                break;
+    
+            
+            default:
+                // Логируем необработанные клавиши (уровень debug)
+                console.debug(`Unhandled key: ${event.key}`);
+                return;
+        }
+    
+ 
+        
+    };
+
     const handleResize = () => {
         clearTimeout(state.resizeTimeout);
         state.resizeTimeout = setTimeout(() => {
@@ -145,6 +193,8 @@ const startMainLoop = () => {
                 elements.canvas.width = window.innerWidth;
                 elements.canvas.height = window.innerHeight;
                 
+      
+
                 Module.ccall('setSize', null, ['number', 'number'], 
                     [ window.innerHeight, window.innerWidth,]);
                 updateCanvas();
@@ -225,6 +275,8 @@ const startMainLoop = () => {
     // 8. Исправляем инициализацию событий
     window.addEventListener('load', () => {
         initCanvas();
+        document.addEventListener('keydown', handleMenuKeyPress);
+
         elements.input.addEventListener('keydown', handleInput);
         window.addEventListener('resize', handleResize);
         

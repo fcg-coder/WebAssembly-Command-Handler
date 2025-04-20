@@ -1,5 +1,6 @@
 #include "commands.hpp"
 #include "../../graphic_lib/screen.hpp"
+#include "../menu/menu.hpp"
 
 extern InputOutputHandler* IOH;
 
@@ -24,5 +25,9 @@ void CommandRotateCube::execute()
     dynamic_cast<ShapeBase3D*>(Screen::getInstance()->getObject("cube"))->rotateX(angle);
     dynamic_cast<ShapeBase3D*>(Screen::getInstance()->getObject("cube"))->rotateY(angle);
     dynamic_cast<ShapeBase3D*>(Screen::getInstance()->getObject("cube"))->rotateZ(angle);
- 
+}
+
+void CommandMenu::execute()
+{
+    auto* menu = new Menu("You touched the computer today? Did it make you happy?", {"Yes", "No"});
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "command_handler/command_handler.hpp"
+#include "command_handler/menu/menu.hpp"
 #include "graphic_lib/screen.hpp"
 // cpp lib
 #include <iostream>

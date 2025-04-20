@@ -37,3 +37,9 @@ class CommandRotateCube : public CommandBase
 public:
     void execute() override;
 };
+
+class CommandMenu : public CommandBase
+{
+public:
+    void execute() override;
+};

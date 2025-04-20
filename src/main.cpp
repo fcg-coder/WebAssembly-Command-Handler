@@ -45,6 +45,17 @@ extern "C" EMSCRIPTEN_KEEPALIVE void setSize(const int height, const int width)
     Screen::getInstance()->setSize(height, width);
 }
 
+extern "C" EMSCRIPTEN_KEEPALIVE void menuMoveDown()
+{
+    Menu::getCurrentInstance()->moveDown();
+}
+
+extern "C" EMSCRIPTEN_KEEPALIVE void menuMoveUp()
+{
+
+    Menu::getCurrentInstance()->moveUp();
+}
+
 int main()
 {
     std::cout.rdbuf(&jsStreamBuffer);
