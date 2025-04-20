@@ -19,6 +19,10 @@ private:
     void initializeCommands();
 
 public:
+    const std::map<std::string, std::unique_ptr<CommandBase>>& getCommandMap() const
+    {
+        return commandMap;
+    }
     static CommandHandler* getInstance();
     void setCommand(const std::string& command);
     std::string getCommand() const;
