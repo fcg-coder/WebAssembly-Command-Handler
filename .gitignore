@@ -3,3 +3,5 @@ src/.DS_Store
 .DS_Store
 build
 report.txt
+src/CMakeFiles
+src/CMakeCache.txt
