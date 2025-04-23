@@ -7,6 +7,7 @@
 #include "commands/commands.hpp"
 
 class CommandBase;
+class History;
 
 class CommandHandler
 {
@@ -14,6 +15,7 @@ private:
     std::string m_currentCommand;
     static CommandHandler* m_instance;
     std::map<std::string, std::unique_ptr<CommandBase>> commandMap;
+    std::unique_ptr<History> history;
 
     CommandHandler();
     void initializeCommands();
