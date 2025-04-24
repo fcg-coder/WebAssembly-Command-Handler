@@ -1,7 +1,8 @@
 src/.DS_Store
-.vscode/settings.json
+.vscode
 .DS_Store
 build
 report.txt
 src/CMakeFiles
 src/CMakeCache.txt
+.qodo

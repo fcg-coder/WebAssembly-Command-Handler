@@ -1,0 +1,39 @@
+@startuml
+actor User
+participant "Browser (JS)" as JS
+participant "HTML DOM" as DOM
+participant "WebAssembly\n(Module)" as WASM
+
+== Старт приложения ==
+User -> JS : Загружает страницу
+JS -> DOM : initCanvas()\n(инициализация canvas)
+JS -> DOM : Назначает обработчики событий\n(keydown, resize)
+
+== Инициализация WASM ==
+JS -> WASM : Инициализация модуля
+WASM -> JS : onRuntimeInitialized()
+JS -> DOM : Устанавливает размеры canvas
+JS -> WASM : ccall('setSize', ...)
+
+== Главный цикл ==
+loop Каждый кадр (~60 FPS)
+    JS -> WASM : _getMode()
+    alt mode !== 0
+        JS -> WASM : _getScreen()
+        JS -> DOM : updateCanvas()\n(рисует изображение из буфера)
+    else mode === 0
+        JS -> DOM : Показывает режим shell
+    end
+end
+
+== Ввод команды ==
+User -> DOM : Ввод текста + Enter
+DOM -> JS : handleInput()
+JS -> DOM : Очищает поле ввода
+JS -> WASM : ccall('processInput', ['string'], [command])
+
+== Обработка стрелок и Escape ==
+User -> JS : Нажимает клавишу (ArrowUp / ArrowDown / Escape)
+JS -> WASM : ccall('pressButton', ['string'], [key])
+
+@enduml
