@@ -11,7 +11,8 @@ RUN emcmake cmake -S /app/src  -B build && \
 
 FROM nginx:alpine
 
-COPY page/ByteBounce.ttf /usr/share/nginx/html/
+COPY page/fonts/ByteBounce.ttf /usr/share/nginx/html/
+COPY page/fonts/UbuntuMono-Regular.ttf /usr/share/nginx/html/
 COPY page/index.html /usr/share/nginx/html/
 COPY page/styles.css /usr/share/nginx/html/
 COPY page/webasm.js /usr/share/nginx/html/
