@@ -3,12 +3,13 @@
 Queue* Queue::m_instance = nullptr;
 extern InputOutputHandler* IOH;
 
-History::History() : commandQueue(Queue::getInstance())
+History::History()
+    : commandQueue(Queue::getInstance())
 {
 }
 void History::description()
 {
-    IOH->output("\tHistory of commands executed\n");
+    IOH->output("\tHistory of commands executed.");
 }
 
 void History::man()
@@ -35,6 +36,5 @@ void History::addCommand(CommandBase* command, std::string name)
     if (commandQueue->getSize() > HISTSIZE)
     {
         CommandBase* oldCmd = commandQueue->pop();
-        // delete oldCmd;
     }
 }

@@ -14,11 +14,11 @@ extern "C" EMSCRIPTEN_KEEPALIVE InputOutputMode getMode()
 
 extern "C" EMSCRIPTEN_KEEPALIVE uint32_t* getScreen()
 {
-    if (InputOutputHandler::getInstance()->mode == InputOutputMode::SCREEN)
-    {
-        return Screen::getInstance()->getScreen();
-    }
-    return 0;
+    // if ((InputOutputHandler::getInstance()->mode == InputOutputMode::SCREEN) || (InputOutputHandler::getInstance()->mode == InputOutputMode::BOTH))
+    // {
+    return Screen::getInstance()->getScreen();
+    // }
+    // return 0;
 }
 
 extern "C" EMSCRIPTEN_KEEPALIVE void printToJS(const char* text)

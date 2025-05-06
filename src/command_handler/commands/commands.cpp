@@ -31,6 +31,7 @@ void CommandScreen::execute()
 {
     IOH->mode = InputOutputMode::SCREEN;
 }
+
 void CommandScreen::man()
 {
 }
@@ -50,6 +51,21 @@ void CommandShell::description()
 {
     IOH->output("\tThis command is used to switch to shell mode.");
 }
+
+void CommandBoth::man()
+{
+}
+
+void CommandBoth::description()
+{
+    IOH->output("\tThis command is used to switch to both mode. Half screen and half shell.");
+}
+
+void CommandBoth::execute()
+{
+    IOH->mode = InputOutputMode::BOTH;
+}
+
 void CommandRotateCube::execute()
 {
     double angle = 3.0 * M_PI / 180.0;

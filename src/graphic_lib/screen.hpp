@@ -138,7 +138,6 @@ private:
 
         std::fill_n(screenBuff, (buffer_size <= MAX_SIZE) ? buffer_size : MAX_SIZE, 0x00000000);
 
-// this is shit but simd
 // https://emscripten.org/docs/porting/simd.html
 #if defined(SIMD) && defined(__wasm_simd128__)
 #    include <wasm_simd128.h>

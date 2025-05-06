@@ -40,6 +40,14 @@ public:
     void description() override;
 };
 
+class CommandBoth : public CommandBase
+{
+public:
+    void execute() override;
+    void man() override;
+    void description() override;
+};
+
 class CommandRotateCube : public CommandBase
 {
 public:

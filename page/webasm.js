@@ -37,7 +37,7 @@
         try {
             const screenPtr = Module._getScreen();
             if (!screenPtr || screenPtr === 0) {
-                console.error("Invalid screen pointer");
+                console.error("Invalid screen pointer, screenPtr =", screenPtr); 
                 return;
             }
     
@@ -80,12 +80,33 @@
     };
 
     const updateUI = () => {
-        const isShellMode = state.mode === 0;
-        // 3. Исправляем логику отображения элементов
-        // elements.output.style.display = isShellMode ? 'block' : 'none';
-        elements.canvasContainer.style.display = isShellMode ? 'none' : 'block';
-        elements.input.style.display = isShellMode ? 'block' : 'none';
+        const mode = state.mode;
+    
+        if (mode === 0) {
+            // Только shell
+            elements.canvasContainer.style.display = 'none';
+            elements.output.style.display = 'block';
+            elements.input.style.display = 'block';
+            elements.output.style.width = '100%';
+            elements.input.style.width = '100%';
+        } else if (mode === 1) {
+            // Только canvas
+            elements.canvasContainer.style.display = 'block';
+            elements.output.style.display = 'none';
+            elements.input.style.display = 'none';
+            elements.canvasContainer.style.width = '100%';
+        } else if (mode === 3) {
+            // BOTH: 50% canvas, 50% shell
+            elements.canvasContainer.style.display = 'inline-block';
+            elements.canvasContainer.style.width = '50%';
+    
+            elements.output.style.display = 'inline-block';
+            elements.output.style.width = '50%';
+            elements.input.style.display = 'inline-block';
+            elements.input.style.width = '50%';
+        }
     };
+    
 
     const mainLoop = () => {
         if (!state.moduleInitialized) {

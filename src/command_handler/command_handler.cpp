@@ -18,6 +18,7 @@ void CommandHandler::initializeCommands()
     commandMap["help"] = std::make_unique<CommandHelp>();
     commandMap["screen"] = std::make_unique<CommandScreen>();
     commandMap["shell"] = std::make_unique<CommandShell>();
+    commandMap["both"] = std::make_unique<CommandBoth>();
     commandMap["rotate"] = std::make_unique<CommandRotateCube>();
     commandMap["menu"] = std::make_unique<CommandMenu>();
     commandMap["history"] = std::unique_ptr<CommandBase>(history.get());

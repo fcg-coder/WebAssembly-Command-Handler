@@ -59,6 +59,7 @@ enum class InputOutputMode
 {
     SHELL,
     SCREEN,
+    BOTH, // both shell and screen
 };
 /**
  * Class handler  input/output from C++ to JS
