@@ -1,20 +1,14 @@
 #include "history.hpp"
+#include "../../kernel/kernel.hpp"
 
-Queue* Queue::m_instance = nullptr;
-extern InputOutputHandler* IOH;
-
-History::History()
-    : commandQueue(Queue::getInstance())
-{
-}
 void History::description()
 {
-    IOH->output("\tHistory of commands executed.");
+    Kernel::IOH()->output("\tHistory of commands executed\n");
 }
 
 void History::man()
 {
-    IOH->output("\tThis command is used to display the history of commands executed.\n");
+    Kernel::IOH()->output("\tThis command is used to display the history of commands executed.\n");
 }
 
 void History::execute()
@@ -24,17 +18,28 @@ void History::execute()
 
 void History::printHistory()
 {
-    commandQueue->forEach([](int id, CommandBase* cmd, const std::string& name) {
-        IOH->output(FormatUtils::formatString(HISTFORMAT, id, name.c_str()));
-    });
+    auto queue = commandQueue;
+
+    while (! queue.empty())
+    {
+        const auto& entry = queue.front();
+
+        Kernel::IOH()->output(
+            FormatUtils::formatString(
+                HISTFORMAT,
+                entry.id,
+                entry.name.c_str()));
+
+        queue.pop();
+    }
 }
 
-void History::addCommand(CommandBase* command, std::string name)
+void History::addCommand(ICommand* command, std::string name)
 {
-
-    commandQueue->push(command, name);
-    if (commandQueue->getSize() > HISTSIZE)
+    if (commandQueue.size() >= HISTSIZE)
     {
-        CommandBase* oldCmd = commandQueue->pop();
+        commandQueue.pop();
     }
+
+    commandQueue.push({nextId++, command, std::move(name)});
 }

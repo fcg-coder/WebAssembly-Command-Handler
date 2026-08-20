@@ -1,8 +1,7 @@
 #include "../screen.hpp"
 #include "shape_base.hpp"
 
-extern InputOutputHandler* IOH;
-std::pair<int, int> (Point3D::*Point3D::projectionMethod)() = nullptr;
+std::pair<int, int> (Point3D::* Point3D::projectionMethod)() = nullptr;
 
 void ShapeBase::line(int x0, int y0, int x1, int y1, const Color& color)
 {
@@ -15,15 +14,15 @@ void ShapeBase::line(int x0, int y0, int x1, int y1, const Color& color)
 
     while (true)
     {
-        if (x0 >= 0 && x0 < Screen::getInstance()->getSize().first &&
-            y0 >= 0 && y0 < Screen::getInstance()->getSize().second)
+        if (x0 >= 0 && x0 < Screen::getInstance().getSize().first &&
+            y0 >= 0 && y0 < Screen::getInstance().getSize().second)
         {
             if (x0 != prevX || y0 != prevY)
             {
                 Pixel pixel(color.red, color.green, color.blue, color.alpha);
                 pixel.x = x0;
                 pixel.y = y0;
-                Screen::getInstance()->addShape(pixel, this->layoutIndex);
+                Screen::getInstance().addShape(pixel, this->layoutIndex);
                 prevX = x0;
                 prevY = y0;
             }

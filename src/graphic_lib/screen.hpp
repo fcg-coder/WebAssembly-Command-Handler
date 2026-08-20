@@ -1,11 +1,11 @@
 #pragma once
 #include <cstdint>
 #include <cstdio>
-#include "../main.hpp"
 #include "shapes/shape_base.hpp"
 #include "shapes/shapes.hpp"
 #include <random>
 #include <utility>
+#include <unordered_map>
 
 #ifdef SIMD
 #    include <wasm_simd128.h>
@@ -65,8 +65,8 @@ struct Color
 class Pixel
 {
 public:
-    int x; // abscissa
-    int y; // ordinate
+    int x;
+    int y;
     Color m_color;
 
     Pixel(uint8_t red = 0, uint8_t green = 0, uint8_t blue = 0, uint8_t alpha = 255)
@@ -100,120 +100,23 @@ public:
  */
 class Screen
 {
-private:
-    void initializeScene();
-
-    Screen()
-    {
-        for (int y = 0; y < MAX_HEIGHT; ++y)
-        {
-            for (int x = 0; x < MAX_WIDTH; ++x)
-            {
-                pixels[y][x] = Pixel(x, y, 0, 0, 0, 0);
-                layoutIndices[y][x] = -1;
-                const int index = y * MAX_WIDTH + x;
-                if (index < MAX_SIZE)
-                {
-                    screenBuff[index] = pixels[y][x].serialize();
-                }
-            }
-        }
-        initializeScene();
-    }
-
-    // Cube cube;
-    static Screen* m_instance;
-    std::map<std::string, ShapeBase*> m_scene; // map of objects with string keys
-    Pixel pixels[MAX_HEIGHT][MAX_WIDTH];       // PIXELS ON SCREEN
-    int layoutIndices[MAX_HEIGHT][MAX_WIDTH];
-
-    static int m_windowHeight;
-    static int m_windowWidth;
-
-    void render()
-    {
-        const int current_width = m_windowWidth;
-        const int current_height = m_windowHeight;
-        const int buffer_size = current_width * current_height;
-
-        std::fill_n(screenBuff, (buffer_size <= MAX_SIZE) ? buffer_size : MAX_SIZE, 0x00000000);
-
-// https://emscripten.org/docs/porting/simd.html
-#if defined(SIMD) && defined(__wasm_simd128__)
-#    include <wasm_simd128.h>
-
-        for (int y = 0; y < current_height; ++y)
-        {
-            int x = 0;
-
-            for (; x <= current_width - 4; x += 4)
-            {
-                const int index = y * current_width + x;
-
-                v128_t pixel_data = wasm_u32x4_make(
-                    pixels[y][x].serialize(),
-                    pixels[y][x + 1].serialize(),
-                    pixels[y][x + 2].serialize(),
-                    pixels[y][x + 3].serialize());
-
-                wasm_v128_store(&screenBuff[index], pixel_data);
-            }
-
-            for (; x < current_width; ++x)
-            {
-                const int index = y * current_width + x;
-                screenBuff[index] = pixels[y][x].serialize();
-            }
-        }
-#else
-        for (int y = 0; y < current_height; ++y)
-        {
-            for (int x = 0; x < current_width; ++x)
-            {
-                const int index = y * current_width + x;
-                if (index < MAX_SIZE)
-                {
-                    screenBuff[index] = pixels[y][x].serialize();
-                }
-            }
-        }
-#endif
-    }
-
-    void clearScreen()
-    {
-        const int current_width = m_windowWidth;
-        const int current_height = m_windowHeight;
-
-        for (int y = 0; y < current_height; ++y)
-        {
-            for (int x = 0; x < current_width; ++x)
-            {
-                pixels[y][x] = Pixel(x, y, 0, 0, 0, 0);
-                layoutIndices[y][x] = -1;
-            }
-        }
-    }
 
 public:
     uint32_t screenBuff[MAX_SIZE];
 
-    static Screen* getInstance()
+    static Screen& getInstance()
     {
-        if (! m_instance)
-        {
-            m_instance = new Screen();
-        }
-        return m_instance;
+        static Screen instance;
+        return instance;
     }
 
     uint32_t* getScreen()
     {
         clearScreen();
-        if (m_windowHeight > MAX_HEIGHT || m_windowWidth > MAX_WIDTH)
-        {
-            return nullptr;
-        }
+        // if (m_windowHeight > MAX_HEIGHT || m_windowWidth > MAX_WIDTH)
+        // {
+        // return nullptr;
+        // }
         for (auto& [key, shape] : m_scene)
         {
             if (shape && shape->mode == ShapeMode::ON)
@@ -273,5 +176,99 @@ public:
     std::pair<int, int> getSize()
     {
         return {m_windowWidth, m_windowHeight};
+    }
+
+private:
+    void initializeScene();
+
+    Screen()
+    {
+        for (int y = 0; y < MAX_HEIGHT; ++y)
+        {
+            for (int x = 0; x < MAX_WIDTH; ++x)
+            {
+                pixels[y][x] = Pixel(x, y, 0, 0, 0, 0);
+                layoutIndices[y][x] = -1;
+                const int index = y * MAX_WIDTH + x;
+                if (index < MAX_SIZE)
+                {
+                    screenBuff[index] = pixels[y][x].serialize();
+                }
+            }
+        }
+        initializeScene();
+    }
+
+    std::unordered_map<std::string, ShapeBase*> m_scene;
+    Pixel pixels[MAX_HEIGHT][MAX_WIDTH];
+    int layoutIndices[MAX_HEIGHT][MAX_WIDTH];
+
+    static inline int m_windowHeight = MAX_HEIGHT;
+    static inline int m_windowWidth = MAX_WIDTH;
+
+    void render()
+    {
+        const int current_width = m_windowWidth;
+        const int current_height = m_windowHeight;
+        const int buffer_size = current_width * current_height;
+
+        std::fill_n(screenBuff, (buffer_size <= MAX_SIZE) ? buffer_size : MAX_SIZE, 0x00000000);
+
+// this is shit but simd
+// https://emscripten.org/docs/porting/simd.html
+#if defined(SIMD) && defined(__wasm_simd128__)
+#    include <wasm_simd128.h>
+
+        for (int y = 0; y < current_height; ++y)
+        {
+            int x = 0;
+
+            for (; x <= current_width - 4; x += 4)
+            {
+                const int index = y * current_width + x;
+
+                v128_t pixel_data = wasm_u32x4_make(
+                    pixels[y][x].serialize(),
+                    pixels[y][x + 1].serialize(),
+                    pixels[y][x + 2].serialize(),
+                    pixels[y][x + 3].serialize());
+
+                wasm_v128_store(&screenBuff[index], pixel_data);
+            }
+
+            for (; x < current_width; ++x)
+            {
+                const int index = y * current_width + x;
+                screenBuff[index] = pixels[y][x].serialize();
+            }
+        }
+#else
+        for (int y = 0; y < current_height; ++y)
+        {
+            for (int x = 0; x < current_width; ++x)
+            {
+                const int index = y * current_width + x;
+                if (index < MAX_SIZE)
+                {
+                    screenBuff[index] = pixels[y][x].serialize();
+                }
+            }
+        }
+#endif
+    }
+
+    void clearScreen()
+    {
+        const int current_width = m_windowWidth;
+        const int current_height = m_windowHeight;
+
+        for (int y = 0; y < current_height; ++y)
+        {
+            for (int x = 0; x < current_width; ++x)
+            {
+                pixels[y][x] = Pixel(x, y, 0, 0, 0, 0);
+                layoutIndices[y][x] = -1;
+            }
+        }
     }
 };

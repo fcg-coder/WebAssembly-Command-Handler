@@ -1,11 +1,9 @@
 #include "../screen.hpp"
 #include "shapes.hpp"
 
-extern InputOutputHandler* IOH;
-
 void Gradient::render()
 {
-    auto [width, height] = Screen::getInstance()->getSize();
+    auto [width, height] = Screen::getInstance().getSize();
 
     for (int y = 0; y < height; y++)
     {
@@ -19,14 +17,14 @@ void Gradient::render()
             Pixel pixel(r, g, b);
             pixel.x = x;
             pixel.y = y;
-            Screen::getInstance()->addShape(pixel, this->layoutIndex);
+            Screen::getInstance().addShape(pixel, this->layoutIndex);
         }
     }
 }
 
 void Square::render()
 {
-    auto [width, height] = Screen::getInstance()->getSize();
+    auto [width, height] = Screen::getInstance().getSize();
     const int size = 100;
     const int half = size / 2;
 

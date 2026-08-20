@@ -5,60 +5,68 @@
 #include <iostream>
 #include <algorithm>
 #include <sstream>
-#include "../../main.hpp"
+#include "command_base.hpp"
 
-class CommandBase
+class CommandHelp : public ICommand, public CommandRegister
 {
 public:
-    virtual ~CommandBase() = default;
-    virtual void execute() = 0;
-    virtual void man() = 0;
-    virtual void description() = 0;
-};
+    CommandHelp()
+        : ICommand("help"), CommandRegister(this)
+    {
+    }
 
-class CommandHelp : public CommandBase
-{
-public:
     void execute() override;
     void man() override;
     void description() override;
 };
 
-class CommandScreen : public CommandBase
+class CommandScreen : public ICommand, public CommandRegister
 {
 public:
+    CommandScreen()
+        : ICommand("screen"), CommandRegister(this)
+    {
+    }
+
     void execute() override;
     void man() override;
     void description() override;
 };
 
-class CommandShell : public CommandBase
+class CommandShell : public ICommand, public CommandRegister
 {
 public:
+    CommandShell()
+        : ICommand("shell"), CommandRegister(this)
+    {
+    }
+
     void execute() override;
     void man() override;
     void description() override;
 };
 
-class CommandBoth : public CommandBase
+class CommandRotateCube : public ICommand, public CommandRegister
 {
 public:
+    CommandRotateCube()
+        : ICommand("rotate_cube"), CommandRegister(this)
+    {
+    }
+
     void execute() override;
     void man() override;
     void description() override;
 };
 
-class CommandRotateCube : public CommandBase
+class CommandMenu : public ICommand, public CommandRegister
 {
 public:
-    void execute() override;
-    void man() override;
-    void description() override;
-};
+    CommandMenu()
+        : ICommand("menu"), CommandRegister(this)
+    {
+    }
 
-class CommandMenu : public CommandBase
-{
-public:
     void execute() override;
     void man() override;
     void description() override;

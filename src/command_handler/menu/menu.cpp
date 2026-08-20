@@ -2,15 +2,11 @@
 #include <sstream>
 #include <algorithm>
 #include <emscripten.h>
-
-extern InputOutputHandler* IOH;
-
-std::unique_ptr<Menu> Menu::m_currentInstance = nullptr;
+#include "../../kernel/kernel.hpp"
 
 void Menu::m_updateScreen()
 {
-
-    IOH->output(render());
+    Kernel::IOH()->output(render());
 }
 
 Menu::Menu(const std::string& question, const std::vector<std::string>& options)
