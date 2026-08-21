@@ -1,11 +1,18 @@
-#include "kernel/kernel.hpp"
-#include "kernel/terminal_ioh.hpp"
-#include "graphic_lib/screen.hpp"
+
 #include <iostream>
 #include <thread>
 #include <chrono>
 
-int main(int argc, char* argv[])
+#include "kernel/kernel.hpp"
+
+int main()
 {
-    Kernel::IOH()->output("Hello\n");
+    Kernel::IOH()->output("Terminal started!\n");
+
+    while (true)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+
+    return 0;
 }

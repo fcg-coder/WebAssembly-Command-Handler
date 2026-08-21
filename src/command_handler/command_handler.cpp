@@ -3,26 +3,30 @@
 #include "command_handler.hpp"
 #include "../kernel/kernel.hpp"
 
- 
-
-void CommandHandler::execute(const std::string& command)
+namespace kernel
 {
-    const auto& commandMap = CommandRegister::getCommands();
-
-    auto it = commandMap.find(command);
-
-    if (it != commandMap.end())
+    void CommandHandler::executeImpl(const std::string& command)
     {
-        it->second->execute();
-        history->addCommand(it->second, command);
-    }
-    else
-    {
-        Kernel::IOH()->output("Unknown command. Available commands:\n");
+        const auto& commandMap = CommandRegister::getCommands();
+        auto it = commandMap.find(command);
 
-        for (const auto& [name, cmd] : commandMap)
+        if (it != commandMap.end())
         {
-            Kernel::IOH()->output(name + "\n");
+            it->second->execute();
+            history->addCommand(it->second, command);
+        }
+        else
+        {
+            /**
+             * @todo \n
+             */
+            Kernel::IOH()->output("\nUnknown command %s. Available commands:\n", command.c_str());
+
+            for (const auto& [name, cmd] : commandMap)
+            {
+                Kernel::IOH()->output(name + "\n");
+            }
         }
     }
-}
+
+} // namespace kernel

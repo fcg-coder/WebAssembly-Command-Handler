@@ -1,39 +1,74 @@
 cmake_minimum_required(VERSION 3.15)
+
 project(TerminalApp)
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Опция для сборки под WebAssembly
-option(BUILD_WEBASM "Build for WebAssembly" OFF)
+# ============================================
+# Build options
+# ============================================
 
-# Определяем платформу
+option(USE_TERMINAL "Build terminal version" ON)
+option(USE_WEBASM "Build WebAssembly version" OFF)
+
+if(USE_WEBASM)
+    add_compile_definitions(USE_WEBASM)
+endif()
+
+
+if(USE_TERMINAL AND USE_WEBASM)
+    message(FATAL_ERROR
+        "USE_TERMINAL and USE_WEBASM cannot be enabled together"
+    )
+endif()
+
+if(NOT USE_TERMINAL AND NOT USE_WEBASM)
+    message(FATAL_ERROR
+        "Either USE_TERMINAL or USE_WEBASM must be enabled"
+    )
+endif()
+
+# ============================================
+# Platform
+# ============================================
+
 if(UNIX AND NOT APPLE)
     set(LINUX TRUE)
 endif()
 
-# Если не WebAssembly, то собираем для терминала
-if(NOT BUILD_WEBASM)
-    set(BUILD_TERMINAL TRUE)
-endif()
+# ============================================
+# Main
+# ============================================
 
-# Основной исполняемый файл
 add_executable(main main.cpp)
 
-# Подключаем поддиректории
+# ============================================
+# Libraries
+# ============================================
+
 add_subdirectory(kernel)
-target_link_libraries(main PRIVATE kernel)
-
 add_subdirectory(graphic_lib)
-target_link_libraries(main PRIVATE graphic_lib)
-
 add_subdirectory(command_handler)
-target_link_libraries(main PRIVATE command_handler)
 
+target_link_libraries(main PRIVATE
+    kernel
+    graphic_lib
+    command_handler
+)
 
-# Настройки для разных платформ
-if(BUILD_TERMINAL)
-    message(STATUS "Building for terminal (Linux)")
+# ============================================
+# Terminal
+# ============================================
+
+if(USE_TERMINAL)
+
+    message(STATUS "================================")
+    message(STATUS "Building TERMINAL version")
+    message(STATUS "================================")
+
+    target_compile_definitions(main PRIVATE USE_TERMINAL)
+    target_compile_definitions(kernel PRIVATE USE_TERMINAL)
 
     target_link_libraries(main PRIVATE
         ncurses
@@ -41,21 +76,37 @@ if(BUILD_TERMINAL)
         rt
     )
 
-    target_compile_definitions(main PRIVATE USE_TERMINAL)
-    target_compile_definitions(kernel PRIVATE USE_TERMINAL)
-
-    # Опции компиляции для Linux
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-        target_compile_options(main PRIVATE -g -O0 -Wall -Wextra)
+        target_compile_options(main PRIVATE
+            -g
+            -O0
+            -Wall
+            -Wextra
+        )
     else()
-        target_compile_options(main PRIVATE -O2 -Wall -Wextra)
+        target_compile_options(main PRIVATE
+            -O2
+            -Wall
+            -Wextra
+        )
     endif()
 
-elseif(BUILD_WEBASM)
-    message(STATUS "Building for WebAssembly")
+    # ============================================
+    # WebAssembly
+    # ============================================
 
-    set_target_properties(main PROPERTIES SUFFIX ".html")
-    set(CMAKE_EXECUTABLE_SUFFIX ".html")
+elseif(USE_WEBASM)
+
+    message(STATUS "================================")
+    message(STATUS "Building WEBASSEMBLY version")
+    message(STATUS "================================")
+
+    target_compile_definitions(main PRIVATE USE_WEBASM)
+    target_compile_definitions(kernel PRIVATE USE_WEBASM)
+
+    set_target_properties(main PROPERTIES
+        SUFFIX ".html"
+    )
 
     target_compile_options(main PRIVATE
         -sWASM=1
@@ -75,6 +126,4 @@ elseif(BUILD_WEBASM)
         -sEXPORTED_FUNCTIONS=_main,_getMode,_getScreen,_processInput,_setSize,_pressButton,_initScreen,_printToJS
     )
 
-    target_compile_definitions(main PRIVATE USE_WEBASM)
-    target_compile_definitions(kernel PRIVATE USE_WEBASM)
 endif()

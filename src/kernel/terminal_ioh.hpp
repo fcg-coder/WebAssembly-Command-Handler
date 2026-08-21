@@ -10,8 +10,8 @@
 
 #include <ncurses.h>
 
-#include "interface.hpp"
-#include "../command_handler/command_handler.hpp"
+#include "shell_base.hpp"
+#include "kernel.hpp"
 
 namespace kernel
 {
@@ -32,27 +32,44 @@ namespace kernel
         void getTerminalSize(int& rows, int& cols);
     };
 
-    class TerminalIOH : public kernel::IShell<TerminalIOH>
+    class TerminalShell : public kernel::IShell<TerminalShell>
     {
-        /* чтоб IShell мог создать по  getInstance*/
-        friend class kernel::IShell<TerminalIOH>;
+        /* чтоб IShell мог создать по getInstance*/
+        friend class kernel::IShell<TerminalShell>;
 
     public:
-        void input(const std::string& inputString);
-        void output(const std::string& outputString);
+        /* чтобы он видел output с аргументами !  */
+        using IShell<TerminalShell>::output;
 
         TerminalGraphics& getGraphics();
 
         void clear();
+        void setScreenMode(bool enabled);
+        bool isScreenMode() const;
+        void renderScreen(uint32_t* screenBuffer, int width, int height);
 
     private:
-        TerminalIOH();
-        ~TerminalIOH();
+        TerminalShell();
+        ~TerminalShell();
+
+        void inputImpl(const std::string& inputString);
+        void outputImpl(const std::string& outputString);
+
         void inputLoop();
         void processCommandQueue();
+        void renderScreenBufferToTerminal(uint32_t* buffer, int width, int height);
 
         std::string m_inputString;
         std::string m_outputString;
+
+        // История вывода терминала
+        std::vector<std::string> m_outputLines;
+
+        // Текущий ввод пользователя
+        std::string m_currentInput;
+
+        // Защита истории вывода
+        std::mutex m_outputMutex;
 
         std::unique_ptr<TerminalGraphics> m_graphics;
 
@@ -64,5 +81,12 @@ namespace kernel
         std::condition_variable m_cv;
 
         std::atomic<bool> m_inputReady;
+
+        // НОВЫЕ ПОЛЯ ДЛЯ SCREEN MODE
+        bool m_screenMode = false;
+        int m_screenWidth = 0;
+        int m_screenHeight = 0;
+        std::vector<std::string> m_history;
+        int m_historyIndex = -1;
     };
 } // namespace kernel

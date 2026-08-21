@@ -1,6 +1,7 @@
 // WebASM compilator's lib
 #include "web_ioh.hpp"
-#include "../graphic_lib/screen.hpp"
+
+class Kernel;
 
 /** SHELL  */
 extern "C" EMSCRIPTEN_KEEPALIVE void output(const char* text)
@@ -19,18 +20,39 @@ extern "C" EMSCRIPTEN_KEEPALIVE void input(const char* input)
         return;
 
     Kernel::IOH()->input(input);
+    // Kernel::execute(inputString);
 }
 
-/** SCREEN */
-extern "C" EMSCRIPTEN_KEEPALIVE kernel::InputOutputMode getMode()
+// /** SCREEN */
+// extern "C" EMSCRIPTEN_KEEPALIVE kernel::InputOutputMode getMode()
+// {
+//     return Kernel::getMode();
+// }
+// extern "C" EMSCRIPTEN_KEEPALIVE uint32_t* getScreen()
+// {
+//     return Kernel::SCREEN().getScreen();
+// }
+// extern "C" EMSCRIPTEN_KEEPALIVE void setSize(const int height, const int width)
+// {
+//     Kernel::SCREEN().setSize(height, width);
+// }
+
+namespace kernel
 {
-    return Kernel::getMode();
-}
-extern "C" EMSCRIPTEN_KEEPALIVE uint32_t* getScreen()
-{
-    return Kernel::SCREEN().getScreen();
-}
-extern "C" EMSCRIPTEN_KEEPALIVE void setSize(const int height, const int width)
-{
-    Kernel::SCREEN().setSize(height, width);
-}
+
+    void WebAsmShell::inputImpl(const std::string& inputString)
+    {
+        Kernel::execute(inputString);
+    }
+
+    void WebAsmShell::outputImpl(const std::string& outputString)
+    {
+        m_outputString = outputString;
+
+        if (! m_outputString.empty())
+        {
+            ::output(m_outputString.c_str());
+            m_outputString.clear();
+        }
+    }
+} // namespace kernel

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdarg>
+#include <cstdio>
 #include <string>
 
 namespace kernel
@@ -16,12 +18,31 @@ namespace kernel
 
         void input(const std::string& inputString)
         {
-            derived().input(inputString);
+            derived().inputImpl(inputString);
         }
 
         void output(const std::string& outputString)
         {
-            derived().output(outputString);
+            derived().outputImpl(outputString);
+        }
+
+        /* элипсис для того чтоб выводить аргументы */
+        void output(const char* format, ...)
+        {
+            char buffer[4096];
+
+            va_list args;
+            va_start(args, format);
+
+            std::vsnprintf(
+                buffer,
+                sizeof(buffer),
+                format,
+                args);
+
+            va_end(args);
+
+            derived().outputImpl(std::string(buffer));
         }
 
     protected:

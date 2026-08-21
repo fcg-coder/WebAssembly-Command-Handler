@@ -2,6 +2,10 @@
 #include <cstdint>
 #include <cstdio>
 
+#ifdef USE_WEBASM
+#endif
+
+using uint = unsigned int;
 /**
  * @brief pixels as RGBA: 0xRRGGBBAA format
  *

@@ -1,36 +1,35 @@
 #pragma once
 
-#include <string>
-#include <memory>
-#include "commands/commands.hpp"
+#include <iostream>
 #include "history/history.hpp"
+#include "commands/commands.hpp"
+#include "command_handler_base.hpp"
+#include <memory>
 
-class CommandHandler
+namespace kernel
 {
-public:
-    static CommandHandler& getInstance()
+
+    class CommandHandler : public CommandHandlerBase<CommandHandler>
     {
-        static CommandHandler instance;
-        return instance;
-    }
+        friend class CommandHandlerBase<CommandHandler>;
 
-    void execute(const std::string& command);
+    private:
+        void executeImpl(const std::string& command);
+        CommandHandler()
+            : history(std::make_unique<History>()),
+              commandHelp(std::make_unique<CommandHelp>()),
+              commandScreen(std::make_unique<CommandScreen>()),
+              commandShell(std::make_unique<CommandShell>()),
+              commandRotateCube(std::make_unique<CommandRotateCube>())
+        {
+        }
 
-private:
-    CommandHandler()
-        : history(std::make_unique<History>()),
-          commandHelp(std::make_unique<CommandHelp>()),
-          commandScreen(std::make_unique<CommandScreen>()),
-          commandShell(std::make_unique<CommandShell>()),
-          commandRotateCube(std::make_unique<CommandRotateCube>())
-    {
-    }
+        std::string m_currentCommand;
 
-    std::string m_currentCommand;
-
-    std::unique_ptr<History> history;
-    std::unique_ptr<CommandHelp> commandHelp;
-    std::unique_ptr<CommandScreen> commandScreen;
-    std::unique_ptr<CommandShell> commandShell;
-    std::unique_ptr<CommandRotateCube> commandRotateCube;
-};
+        std::unique_ptr<History> history;
+        std::unique_ptr<CommandHelp> commandHelp;
+        std::unique_ptr<CommandScreen> commandScreen;
+        std::unique_ptr<CommandShell> commandShell;
+        std::unique_ptr<CommandRotateCube> commandRotateCube;
+    };
+} // namespace kernel

@@ -154,7 +154,7 @@ namespace kernel
         getmaxyx(stdscr, rows, cols);
     }
 
-    TerminalIOH::TerminalIOH()
+    TerminalShell::TerminalShell()
         : m_running(true),
           m_inputReady(false)
     {
@@ -182,10 +182,10 @@ namespace kernel
         m_graphics = std::make_unique<TerminalGraphics>();
 
         m_inputThread =
-            std::thread(&TerminalIOH::inputLoop, this);
+            std::thread(&TerminalShell::inputLoop, this);
     }
 
-    TerminalIOH::~TerminalIOH()
+    TerminalShell::~TerminalShell()
     {
         m_running = false;
 
@@ -195,8 +195,7 @@ namespace kernel
         endwin();
     }
 
-    void TerminalIOH::input(
-        const std::string& inputString)
+    void TerminalShell::inputImpl(const std::string& inputString)
     {
         std::lock_guard<std::mutex> lock(m_queueMutex);
 
@@ -206,31 +205,66 @@ namespace kernel
         m_cv.notify_one();
     }
 
-    void TerminalIOH::output(
-        const std::string& outputString)
+    void TerminalShell::outputImpl(const std::string& outputString)
     {
         if (outputString.empty())
             return;
 
-        m_graphics->drawText(
-            0,
-            LINES - 2,
-            std::string(COLS, ' '));
+        std::lock_guard<std::mutex> lock(m_outputMutex);
 
-        m_graphics->drawText(
-            0,
-            LINES - 2,
-            outputString);
+        // Разбиваем output по строкам
+        std::string line;
 
-        m_graphics->refresh();
+        for (char c : outputString)
+        {
+            if (c == '\n')
+            {
+                m_outputLines.push_back(line);
+                line.clear();
+            }
+            else
+            {
+                line += c;
+            }
+        }
+
+        if (! line.empty())
+            m_outputLines.push_back(line);
+
+        // Ограничиваем историю
+        const int maxOutputLines = std::max(1, LINES - 2);
+
+        while (static_cast<int>(m_outputLines.size()) > maxOutputLines)
+            m_outputLines.erase(m_outputLines.begin());
+
+        if (! m_screenMode) // ТОЛЬКО ЭТО ДОБАВЛЕНО
+        {
+            ::clear();
+
+            for (int i = 0; i < static_cast<int>(m_outputLines.size()); ++i)
+            {
+                m_graphics->drawText(
+                    0,
+                    i,
+                    m_outputLines[i]);
+            }
+
+            // Строка ввода
+            m_graphics->drawText(
+                0,
+                LINES - 1,
+                "> " + m_currentInput);
+
+            m_graphics->refresh();
+        }
     }
 
-    TerminalGraphics& TerminalIOH::getGraphics()
+    TerminalGraphics& TerminalShell::getGraphics()
     {
         return *m_graphics;
     }
 
-    void TerminalIOH::clear()
+    void TerminalShell::clear()
     {
         ::clear();
 
@@ -238,9 +272,129 @@ namespace kernel
             m_graphics->refresh();
     }
 
-    void TerminalIOH::inputLoop()
+    // НОВЫЙ МЕТОД
+    void TerminalShell::setScreenMode(bool enabled)
+    {
+        m_screenMode = enabled;
+
+        if (enabled)
+        {
+            int rows, cols;
+            m_graphics->getTerminalSize(rows, cols);
+            m_screenWidth = cols;
+            m_screenHeight = rows - 2;
+
+            ::clear();
+            m_graphics->drawText(0, 0, "=== SCREEN MODE ===");
+            m_graphics->drawText(0, 1, "Press ESC to exit");
+            m_graphics->refresh();
+        }
+        else
+        {
+            m_screenWidth = 0;
+            m_screenHeight = 0;
+            ::clear();
+            m_outputLines.clear();
+            m_graphics->refresh();
+        }
+    }
+
+    // НОВЫЙ МЕТОД
+    bool TerminalShell::isScreenMode() const
+    {
+        return m_screenMode;
+    }
+
+    // НОВЫЙ МЕТОД
+    void TerminalShell::renderScreen(uint32_t* screenBuffer, int width, int height)
+    {
+        if (! m_screenMode || ! screenBuffer)
+            return;
+
+        std::lock_guard<std::mutex> lock(m_outputMutex);
+
+        ::clear();
+
+        int termRows, termCols;
+        m_graphics->getTerminalSize(termRows, termCols);
+
+        int renderWidth = std::min(width, termCols);
+        int renderHeight = std::min(height, termRows - 2);
+
+        const char* gradient = " .:-=+*#%@";
+        const int gradientSize = 10;
+
+        for (int y = 0; y < renderHeight; ++y)
+        {
+            for (int x = 0; x < renderWidth; ++x)
+            {
+                uint32_t color = screenBuffer[y * width + x];
+                uint8_t r = (color >> 16) & 0xFF;
+                uint8_t g = (color >> 8) & 0xFF;
+                uint8_t b = color & 0xFF;
+
+                if (r == 0 && g == 0 && b == 0)
+                {
+                    mvaddch(y + 1, x, ' ');
+                    continue;
+                }
+
+                int brightness = (r * 30 + g * 59 + b * 11) / 100;
+                int index = (brightness * gradientSize) / 256;
+                if (index >= gradientSize)
+                    index = gradientSize - 1;
+
+                if (has_colors())
+                {
+                    int colorPair = 1;
+                    if (r > 200 && g > 200 && b > 200)
+                        colorPair = 1;
+                    else if (r > 200 && g < 100 && b < 100)
+                        colorPair = 2;
+                    else if (r < 100 && g > 200 && b < 100)
+                        colorPair = 3;
+                    else if (r < 100 && g < 100 && b > 200)
+                        colorPair = 5;
+                    else if (r > 200 && g > 200 && b < 100)
+                        colorPair = 4;
+                    else if (r > 200 && g < 100 && b > 200)
+                        colorPair = 6;
+                    else if (r < 100 && g > 200 && b > 200)
+                        colorPair = 7;
+
+                    attron(COLOR_PAIR(colorPair));
+                }
+
+                mvaddch(y + 1, x, gradient[index]);
+
+                if (has_colors())
+                {
+                    attroff(COLOR_PAIR(1));
+                }
+            }
+        }
+
+        attron(A_REVERSE);
+        std::string status = " SCREEN MODE | Buffer: " +
+                             std::to_string(width) + "x" + std::to_string(height) +
+                             " | Press ESC to exit ";
+        m_graphics->drawText(0, 0, status);
+        attroff(A_REVERSE);
+
+        m_graphics->drawText(0, termRows - 1, " Press ESC to exit ");
+        m_graphics->refresh();
+    }
+
+    void TerminalShell::inputLoop()
     {
         std::string currentInput;
+
+        m_graphics->drawText(
+            0,
+            LINES - 2,
+            "> ");
+
+        m_graphics->refresh();
 
         while (m_running)
         {
@@ -256,48 +410,134 @@ namespace kernel
                 continue;
             }
 
+            // НОВОЕ: Обработка ESC в screen mode
+            if (m_screenMode)
+            {
+                if (ch == 27) // ESC
+                {
+                    setScreenMode(false);
+                    output("Exited screen mode\n");
+                    continue;
+                }
+                continue;
+            }
+
             if (ch == '\n' || ch == '\r')
             {
                 if (! currentInput.empty())
                 {
+                    // Сохраняем в историю
+                    if (m_history.empty() || m_history.back() != currentInput)
+                    {
+                        m_history.push_back(currentInput);
+                    }
+                    m_historyIndex = m_history.size();
+
+                    // Отправляем команду
+                    input(currentInput);
+
+                    currentInput.clear();
+
+                    // Очищаем строку ввода
+                    m_graphics->drawText(
+                        0,
+                        LINES - 2,
+                        std::string(COLS, ' '));
 
                     m_graphics->drawText(
-                        2,
+                        0,
                         LINES - 2,
-                        std::string(COLS - 4, ' '));
-
-                    m_graphics->drawText(
-                        2,
-                        LINES - 2,
-                        currentInput);
+                        "> ");
 
                     m_graphics->refresh();
-
-                    input(currentInput);
-                    currentInput.clear();
                 }
+
+                continue;
             }
-            else if (ch == 127 || ch == KEY_BACKSPACE)
+
+            if (ch == 127 || ch == KEY_BACKSPACE)
             {
                 if (! currentInput.empty())
                 {
                     currentInput.pop_back();
+
+                    m_graphics->drawText(
+                        0,
+                        LINES - 2,
+                        std::string(COLS, ' '));
+
+                    m_graphics->drawText(
+                        0,
+                        LINES - 2,
+                        "> " + currentInput);
+
+                    m_graphics->refresh();
                 }
-            }
-            else if (ch >= 32 && ch <= 126)
-            {
-                currentInput.push_back(
-                    static_cast<char>(ch));
-            }
-            else if (ch == KEY_UP)
-            {
+
+                continue;
             }
 
-            processCommandQueue();
+            if (ch >= 32 && ch <= 126)
+            {
+                currentInput += static_cast<char>(ch);
+
+                m_graphics->drawText(
+                    0,
+                    LINES - 2,
+                    "> " + currentInput);
+
+                m_graphics->refresh();
+
+                continue;
+            }
+
+            // НОВОЕ: История команд
+            if (ch == KEY_UP)
+            {
+                if (! m_history.empty())
+                {
+                    if (m_historyIndex > 0)
+                        m_historyIndex--;
+                    else
+                        m_historyIndex = 0;
+
+                    currentInput = m_history[m_historyIndex];
+
+                    m_graphics->drawText(0, LINES - 2, std::string(COLS, ' '));
+                    m_graphics->drawText(0, LINES - 2, "> " + currentInput);
+                    m_graphics->refresh();
+                }
+                continue;
+            }
+
+            if (ch == KEY_DOWN)
+            {
+                if (! m_history.empty())
+                {
+                    if (m_historyIndex < static_cast<int>(m_history.size()) - 1)
+                        m_historyIndex++;
+                    else
+                        m_historyIndex = m_history.size();
+
+                    if (m_historyIndex < static_cast<int>(m_history.size()))
+                    {
+                        currentInput = m_history[m_historyIndex];
+                    }
+                    else
+                    {
+                        currentInput.clear();
+                    }
+
+                    m_graphics->drawText(0, LINES - 2, std::string(COLS, ' '));
+                    m_graphics->drawText(0, LINES - 2, "> " + currentInput);
+                    m_graphics->refresh();
+                }
+                continue;
+            }
         }
     }
 
-    void TerminalIOH::processCommandQueue()
+    void TerminalShell::processCommandQueue()
     {
         std::lock_guard<std::mutex> lock(m_queueMutex);
 
@@ -308,7 +548,7 @@ namespace kernel
 
             m_commandQueue.pop();
 
-            CommandHandler::getInstance().execute(cmd);
+            Kernel::executeCmd(cmd);
         }
     }
 } // namespace kernel
