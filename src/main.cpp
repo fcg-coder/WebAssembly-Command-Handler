@@ -1,11 +1,11 @@
 #include "kernel/kernel.hpp"
-#include "kernel/web_ioh.hpp"
+#include "kernel/terminal_ioh.hpp"
+#include "graphic_lib/screen.hpp"
+#include <iostream>
+#include <thread>
+#include <chrono>
 
-int main()
+int main(int argc, char* argv[])
 {
-    Kernel::init(web::WebAsmIOH::getInstance());
-
     Kernel::IOH()->output("Hello\n");
-
-    return 0;
 }

@@ -58,16 +58,3 @@ public:
     void man() override;
     void description() override;
 };
-
-class CommandMenu : public ICommand, public CommandRegister
-{
-public:
-    CommandMenu()
-        : ICommand("menu"), CommandRegister(this)
-    {
-    }
-
-    void execute() override;
-    void man() override;
-    void description() override;
-};

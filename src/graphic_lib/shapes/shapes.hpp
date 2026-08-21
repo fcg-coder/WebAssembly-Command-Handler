@@ -1,3 +1,4 @@
+// src/graphic_lib/shapes/shapes.hpp
 #pragma once
 
 #include "shape_base.hpp"
@@ -13,29 +14,19 @@ class CoordinateSystem : public ShapeBase3D
 {
 public:
     CoordinateSystem();
-
     void render() override;
 };
 
 class Gradient : public ShapeBase
 {
 public:
-    Gradient()
-    {
-        layoutIndex = 999;
-    }
+    Gradient() { layoutIndex = 1; }
     void render() override;
 };
 
 class Square : public ShapeBase
-
 {
-
 public:
-    Square()
-    {
-        
-        layoutIndex = 2;
-    }
+    Square() { layoutIndex = 2; }
     void render() override;
 };

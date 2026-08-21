@@ -1,9 +1,9 @@
-#include "../screen.hpp"
-#include "shapes.hpp"
 
+#include "shapes.hpp"
+#include "../../kernel/kernel.hpp"
 void Gradient::render()
 {
-    auto [width, height] = Screen::getInstance().getSize();
+    auto [width, height] = Kernel::SCREEN()->getSize();
 
     for (int y = 0; y < height; y++)
     {
@@ -17,14 +17,14 @@ void Gradient::render()
             Pixel pixel(r, g, b);
             pixel.x = x;
             pixel.y = y;
-            Screen::getInstance().addShape(pixel, this->layoutIndex);
+            Kernel::SCREEN()->addShape(pixel, this->layoutIndex);
         }
     }
 }
 
 void Square::render()
 {
-    auto [width, height] = Screen::getInstance().getSize();
+    auto [width, height] = Kernel::SCREEN()->getSize();
     const int size = 100;
     const int half = size / 2;
 
@@ -90,7 +90,6 @@ void Cube::render()
 
 CoordinateSystem::CoordinateSystem()
 {
-
     points = {
         new Point3D(0, 0, 0),
         new Point3D(1000, 0, 0),

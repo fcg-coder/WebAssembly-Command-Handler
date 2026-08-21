@@ -2,6 +2,7 @@
 #include <iostream>
 #include <algorithm>
 #include <cmath>
+#include <vector>
 
 // forward_decls
 class Screen;
@@ -27,11 +28,6 @@ public:
     virtual void render() = 0;
     virtual ~ShapeBase() = default;
 
-    /**
-     * @brief Draws a line between two points (x0, y0) and (x1, y1) using Bresenham's algorithm.
-
-     *
-     */
     void line(int x0, int y0, int x1, int y1, const Color& color);
 };
 

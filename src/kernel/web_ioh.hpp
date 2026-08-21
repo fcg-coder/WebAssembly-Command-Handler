@@ -9,13 +9,20 @@
 
 #include "../command_handler/command_handler.hpp"
 #include "interface.hpp"
+#include "kernel.hpp"
+
+extern "C" EMSCRIPTEN_KEEPALIVE kernel::InputOutputMode getMode();
+
+extern "C" EMSCRIPTEN_KEEPALIVE uint32_t* getScreen();
+
+extern "C" EMSCRIPTEN_KEEPALIVE void output(const char* text);
+
+extern "C" EMSCRIPTEN_KEEPALIVE void input(const char* input);
+
+extern "C" EMSCRIPTEN_KEEPALIVE void setSize(int height, int width);
 
 namespace web
 {
-
-    extern "C" EMSCRIPTEN_KEEPALIVE void printToJS(const char* text);
-
-    extern "C" EMSCRIPTEN_KEEPALIVE void processInput(const char* input);
 
     class JSStreamBuffer : public std::streambuf
     {
@@ -31,7 +38,7 @@ namespace web
 
                 if (c == '\n')
                 {
-                    printToJS(buffer.c_str());
+                    output(buffer.c_str());
                     buffer.clear();
                 }
             }
@@ -43,7 +50,7 @@ namespace web
         {
             if (! buffer.empty())
             {
-                printToJS(buffer.c_str());
+                output(buffer.c_str());
                 buffer.clear();
             }
 
@@ -54,51 +61,35 @@ namespace web
     extern JSStreamBuffer jsStreamBuffer;
     extern std::ostream jsCout;
 
-    class WebAsmIOH : public kernel::IInputOutputHandler
+    class WebAsmShell : public kernel::IShell
     {
 
     public:
-        static WebAsmIOH& getInstance()
+        static WebAsmShell& getInstance()
         {
-            static WebAsmIOH instate;
+            static WebAsmShell instate;
             return instate;
         };
 
         void input(const std::string& inputString) override
         {
-            m_inputString = inputString;
-            CommandHandler::getInstance().execute(m_inputString);
-            m_inputString.clear();
+            CommandHandler::getInstance().execute(inputString);
         }
 
-        void
-        output(const std::string& outputString) override
+        void output(const std::string& outputString) override
         {
             m_outputString = outputString;
 
             if (! m_outputString.empty())
             {
-                printToJS(m_outputString.c_str());
+                output(m_outputString.c_str());
                 m_outputString.clear();
             }
         }
 
-        void setMode(kernel::InputOutputMode mode) override
-        {
-            m_mode = mode;
-        }
-
-        kernel::InputOutputMode getMode() const override
-        {
-            return m_mode;
-        }
-
     private:
-        std::string m_inputString;
         std::string m_outputString;
 
-        WebAsmIOH() = default;
-        kernel::InputOutputMode m_mode =
-            kernel::InputOutputMode::SHELL;
+        WebAsmShell() = default;
     };
 } // namespace web

@@ -4,23 +4,39 @@
 
 namespace kernel
 {
-
-    enum class InputOutputMode
-    {
-        SHELL,
-        SCREEN
-    };
-
-    class IInputOutputHandler
+    template <typename Derived>
+    class IShell
     {
     public:
-        virtual ~IInputOutputHandler() = default;
+        static Derived& getInstance()
+        {
+            static Derived instance;
+            return instance;
+        }
 
-        virtual void input(const std::string& inputString) = 0;
-        virtual void output(const std::string& outputString) = 0;
+        void input(const std::string& inputString)
+        {
+            derived().input(inputString);
+        }
 
-        virtual void setMode(InputOutputMode mode) = 0;
-        virtual InputOutputMode getMode() const = 0;
+        void output(const std::string& outputString)
+        {
+            derived().output(outputString);
+        }
+
+    protected:
+        IShell() = default;
+        ~IShell() = default;
+
+    private:
+        Derived& derived()
+        {
+            return static_cast<Derived&>(*this);
+        }
+
+        const Derived& derived() const
+        {
+            return static_cast<const Derived&>(*this);
+        }
     };
-
 } // namespace kernel

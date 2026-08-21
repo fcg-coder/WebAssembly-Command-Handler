@@ -22,8 +22,7 @@ private:
           commandHelp(std::make_unique<CommandHelp>()),
           commandScreen(std::make_unique<CommandScreen>()),
           commandShell(std::make_unique<CommandShell>()),
-          commandRotateCube(std::make_unique<CommandRotateCube>()),
-          commandMenu(std::make_unique<CommandMenu>())
+          commandRotateCube(std::make_unique<CommandRotateCube>())
     {
     }
 
@@ -34,5 +33,4 @@ private:
     std::unique_ptr<CommandScreen> commandScreen;
     std::unique_ptr<CommandShell> commandShell;
     std::unique_ptr<CommandRotateCube> commandRotateCube;
-    std::unique_ptr<CommandMenu> commandMenu;
 };
