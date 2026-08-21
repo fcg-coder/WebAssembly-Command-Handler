@@ -1,10 +1,9 @@
 #include "screen.hpp"
-
+#include "shapes/shapes.hpp"
 #include <algorithm>
 
 namespace kernel
 {
-
     Screen::Screen()
     {
         for (int y = 0; y < MAX_HEIGHT; ++y)
@@ -70,7 +69,9 @@ namespace kernel
 
     void Screen::initializeScene()
     {
-        // Инициализация сцены
+
+        addObject("cube", new Cube());
+        // addObject("Gradient", new Gradient());
     }
 
     void Screen::renderObjects()

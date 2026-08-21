@@ -43,10 +43,10 @@ void Square::render()
 Cube::Cube()
 {
 
-    int size = 250;
-    int offsetX = 500; // Center offset on the X-axis
-    int offsetY = 500; // Center offset on the Y-axis
-    int offsetZ = 500; // Center offset on the Z-axis
+    int size = 15;
+    int offsetX = 100; // Center offset on the X-axis
+    int offsetY = 30;  // Center offset on the Y-axis
+    int offsetZ = 10;  // Center offset on the Z-axis
 
     points = {
         new Point3D(-size + offsetX, -size + offsetY, size + offsetZ),
@@ -65,8 +65,8 @@ Cube::Cube()
 
 void Cube::render()
 {
-    Point3D::setProjectionMethod(&Point3D::perspectiveProjection);
-    // Point3D::setProjectionMethod(&Point3D::orthographicProjection);
+    // Point3D::setProjectionMethod(&Point3D::perspectiveProjection);
+    Point3D::setProjectionMethod(&Point3D::orthographicProjection);
     double angle = 2.0 * M_PI / 180.0;
     rotateX(angle);
     rotateY(angle);
