@@ -60,6 +60,9 @@ class Kernel final
 public:
     static kernel::ShellType* IOH();
     static kernel::ScreenType* SCREEN();
+    /*
+     * @todo add argv
+     */
     static void executeCmd(const std::string& command);
     static void setMode(kernel::InputOutputMode mode);
     static kernel::InputOutputMode getMode();

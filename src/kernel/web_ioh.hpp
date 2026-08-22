@@ -27,7 +27,6 @@ namespace kernel
     class WebAsmShell : public kernel::IShell<WebAsmShell>
     {
         friend class kernel::IShell<WebAsmShell>;
-
     public:
         using IShell<WebAsmShell>::output;
 

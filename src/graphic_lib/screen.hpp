@@ -2,43 +2,48 @@
 
 #include <cstdint>
 #include <utility>
-#include <unordered_map>
 
 #include "shapes/shape_base.hpp"
 #include "colors.hpp"
 #include "constants.hpp"
 #include "base.hpp"
+#include "scene.hpp"
 
 namespace kernel
 {
     class Screen : public ScreenBase<Screen>
     {
         friend class kernel::ScreenBase<Screen>;
-
     public:
         uint32_t* getScreen();
 
         void addShape(Pixel p, int layoutIndex);
-        void setSize(uint h, uint w);
 
-        void addObject(const char* key, ShapeBase* shape);
-        void removeObject(const char* key);
+        void setSize(uint h,uint ws);
+
         std::pair<int, int> getSize();
 
+        bool loadScene(const std::string& key) { return m_scenes.load(key) != nullptr; }
     private:
         Screen();
+
         static inline bool isInited = false;
+
         void initializeScene();
-        void renderObjects();
+
         void render();
+        void renderObjects();
         void clearScreen();
 
         uint32_t screenBuff[MAX_SIZE];
+
         Pixel pixels[MAX_HEIGHT][MAX_WIDTH];
+
         int layoutIndixes[MAX_HEIGHT][MAX_WIDTH];
-        std::unordered_map<const char*, ShapeBase*> m_scene;
+
+        scene::SceneRegister m_scenes;
 
         uint m_windowHeight = MAX_HEIGHT;
         uint m_windowWidth = MAX_WIDTH;
     };
-} // namespace kernel
+}

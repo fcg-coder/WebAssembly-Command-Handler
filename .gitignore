@@ -6,3 +6,4 @@ report.txt
 src/CMakeFiles
 src/CMakeCache.txt
 .qodo
+.idea

@@ -21,6 +21,8 @@ namespace kernel
             derived().inputImpl(inputString);
         }
 
+
+
         void output(const std::string& outputString)
         {
             derived().outputImpl(outputString);
@@ -34,11 +36,7 @@ namespace kernel
             va_list args;
             va_start(args, format);
 
-            std::vsnprintf(
-                buffer,
-                sizeof(buffer),
-                format,
-                args);
+            std::vsnprintf(buffer, sizeof(buffer), format, args);
 
             va_end(args);
 

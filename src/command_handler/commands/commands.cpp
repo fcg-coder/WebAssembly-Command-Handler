@@ -45,3 +45,48 @@ void CommandShell::description()
 {
     Kernel::IOH()->output("\tThis command is used to switch to shell mode.");
 }
+
+
+void CommandLoadSceneCube::execute()
+{
+    auto* screen = Kernel::SCREEN();
+
+    if (!screen)
+        return;
+
+    screen->loadScene("cubeScene");
+    Kernel::setMode(kernel::InputOutputMode::SCREEN);
+}
+
+void CommandLoadSceneCube::man()
+{
+
+}
+
+void CommandLoadSceneCube::description()
+{
+    Kernel::IOH()->output("\tLoad and display the cube scene.");
+}
+
+
+void CommandLoadScenePyramid::execute()
+{
+    auto* screen = Kernel::SCREEN();
+
+    if (!screen)
+        return;
+    screen->loadScene("pyramidScene");
+    Kernel::setMode(kernel::InputOutputMode::SCREEN);
+
+}
+
+void CommandLoadScenePyramid::man()
+{
+
+}
+
+
+void CommandLoadScenePyramid::description()
+{
+    Kernel::IOH()->output("\tLoad and display the pyramid scene.");
+}

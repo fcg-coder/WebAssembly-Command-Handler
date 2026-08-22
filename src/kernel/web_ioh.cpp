@@ -39,7 +39,6 @@ extern "C" EMSCRIPTEN_KEEPALIVE void setSize(const int height, const int width)
 
 namespace kernel
 {
-
     void WebAsmShell::inputImpl(const std::string& inputString)
     {
         Kernel::executeCmd(inputString);

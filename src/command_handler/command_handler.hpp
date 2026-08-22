@@ -8,18 +8,20 @@
 
 namespace kernel
 {
-
     class CommandHandler : public CommandHandlerBase<CommandHandler>
     {
         friend class CommandHandlerBase<CommandHandler>;
 
     private:
         void executeImpl(const std::string& command);
+
         CommandHandler()
             : history(std::make_unique<History>()),
               commandHelp(std::make_unique<CommandHelp>()),
               commandScreen(std::make_unique<CommandScreen>()),
-              commandShell(std::make_unique<CommandShell>())
+              commandShell(std::make_unique<CommandShell>()),
+              commandLoadSceneCube(std::make_unique<CommandLoadSceneCube>()),
+              commandLoadScenePyramid(std::make_unique<CommandLoadScenePyramid>())
         {
         }
 
@@ -29,5 +31,7 @@ namespace kernel
         std::unique_ptr<CommandHelp> commandHelp;
         std::unique_ptr<CommandScreen> commandScreen;
         std::unique_ptr<CommandShell> commandShell;
+        std::unique_ptr<CommandLoadSceneCube> commandLoadSceneCube;
+        std::unique_ptr<CommandLoadScenePyramid> commandLoadScenePyramid;
     };
 } // namespace kernel

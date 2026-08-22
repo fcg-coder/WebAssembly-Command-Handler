@@ -1,6 +1,6 @@
 #include "screen.hpp"
-#include "shapes/shapes.hpp"
 #include <algorithm>
+#include <memory>
 
 namespace kernel
 {
@@ -9,91 +9,75 @@ namespace kernel
         for (int y = 0; y < MAX_HEIGHT; ++y)
         {
             const int offset = y * MAX_WIDTH;
+
             for (int x = 0; x < MAX_WIDTH; ++x)
             {
-                pixels[y][x] = Pixel(x, y, 0, 0, 0, 0);
+                pixels[y][x] = Pixel(x,y,0,0,0,0);
+
                 layoutIndixes[y][x] = -1;
                 screenBuff[offset + x] = pixels[y][x].serialize();
             }
         }
     }
 
+
     uint32_t* Screen::getScreen()
     {
-        if (! isInited)
+        if (!isInited)
             initializeScene();
+
         clearScreen();
+
         render();
 
         return screenBuff;
     }
 
-    void Screen::addShape(Pixel p, int layoutIndex)
+
+    void Screen::addShape(Pixel p,int layoutIndex)
     {
-        if (p.x < 0 || p.x >= static_cast<int>(m_windowWidth) ||
-            p.y < 0 || p.y >= static_cast<int>(m_windowHeight))
+        if (p.x < 0 ||p.x >= static_cast<int>(m_windowWidth) ||p.y < 0 || p.y >= static_cast<int>(m_windowHeight))
         {
             return;
         }
 
-        if (layoutIndixes[p.y][p.x] == -1 ||
-            layoutIndex <= layoutIndixes[p.y][p.x])
+        if (layoutIndixes[p.y][p.x] == -1 || layoutIndex <= layoutIndixes[p.y][p.x])
         {
             pixels[p.y][p.x] = p;
             layoutIndixes[p.y][p.x] = layoutIndex;
         }
     }
 
-    void Screen::setSize(uint h, uint w)
-    {
-        m_windowHeight = std::min(h, static_cast<uint>(MAX_HEIGHT));
-        m_windowWidth = std::min(w, static_cast<uint>(MAX_WIDTH));
-    }
 
-    void Screen::addObject(const char* key, ShapeBase* shape)
+    void Screen::setSize(uint h,uint w )
     {
-        m_scene[key] = shape;
-    }
-
-    void Screen::removeObject(const char* key)
-    {
-        m_scene.erase(key);
+        m_windowHeight = std::min(h,static_cast<uint>(MAX_HEIGHT));
+        m_windowWidth = std::min(w,static_cast<uint>(MAX_WIDTH));
     }
 
     std::pair<int, int> Screen::getSize()
     {
-        return {static_cast<int>(m_windowWidth), static_cast<int>(m_windowHeight)};
-    }
-
-    void Screen::initializeScene()
-    {
-        addObject("Pyramid", new Pyramid());
-        addObject("cube", new Cube());
-        addObject("Gradient", new Gradient());
-        addObject("Square", new Square());
-        isInited = true;
-    }
-
-    void Screen::renderObjects()
-    {
-        for (auto& [key, shape] : m_scene)
-        {
-            if (shape && shape->mode == isVisible::ON)
-            {
-                shape->render();
-            }
-        }
+        return {static_cast<int>(m_windowWidth),static_cast<int>(m_windowHeight)};
     }
 
     void Screen::render()
     {
-        renderObjects();
 
-        const int width = std::min(static_cast<int>(m_windowWidth), static_cast<int>(MAX_WIDTH));
-        const int height = std::min(static_cast<int>(m_windowHeight), static_cast<int>(MAX_HEIGHT));
-        const int bufferSize = std::min(width * height, static_cast<int>(MAX_SIZE));
+        scene::Scene* currentScene = m_scenes.current();
 
-        std::fill_n(screenBuff, bufferSize, 0x00000000);
+        if (!currentScene)
+            return;
+
+        currentScene->render();
+
+
+        const int width = std::min(static_cast<int>(m_windowWidth),static_cast<int>(MAX_WIDTH));
+        const int height =std::min(static_cast<int>(m_windowHeight),static_cast<int>(MAX_HEIGHT));
+
+        const int bufferSize =std::min(width * height,static_cast<int>(MAX_SIZE));
+
+        std::fill_n( screenBuff,bufferSize,0x00000000 );
+
 
         for (int y = 0; y < height; ++y)
         {
@@ -107,22 +91,25 @@ namespace kernel
                     break;
 
                 screenBuff[index] = pixels[y][x].serialize();
+
             }
         }
     }
 
+
     void Screen::clearScreen()
     {
-        const int width = std::min(static_cast<int>(m_windowWidth), static_cast<int>(MAX_WIDTH));
-        const int height = std::min(static_cast<int>(m_windowHeight), static_cast<int>(MAX_HEIGHT));
+        const int width = std::min( static_cast<int>(m_windowWidth),static_cast<int>(MAX_WIDTH));
+
+        const int height = std::min( static_cast<int>(m_windowHeight), static_cast<int>(MAX_HEIGHT));
 
         for (int y = 0; y < height; ++y)
         {
             for (int x = 0; x < width; ++x)
             {
-                pixels[y][x] = Pixel(x, y, 0, 0, 0, 0);
+                pixels[y][x] = Pixel(x,y,0,0,0,0);
                 layoutIndixes[y][x] = -1;
             }
         }
     }
-} // namespace kernel
+}

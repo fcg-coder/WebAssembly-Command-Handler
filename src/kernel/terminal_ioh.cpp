@@ -6,8 +6,7 @@
 namespace kernel
 {
     TerminalShell::TerminalShell()
-        : m_running(true),
-          m_inputReady(false)
+        : m_running(true), m_inputReady(false)
     {
         initscr();
         cbreak();
@@ -105,100 +104,104 @@ namespace kernel
 
         while (m_running)
         {
-
             if (Kernel::getMode() == InputOutputMode::SCREEN)
             {
-                auto* screen = Kernel::SCREEN();
+                const int ch = getch();
 
-                if (screen)
+                if (ch == 27)
                 {
-                    const int width = m_graphics->getWindowSize().first;
-                    const int height = m_graphics->getWindowSize().second;
-                    screen->setSize(height, width);
-
-                    uint32_t* buffer = screen->getScreen();
-
-                    if (buffer && width > 0 && height > 0)
-                    {
-                        m_graphics->clear();
-
-                        m_graphics->drawScreen(buffer, width, height);
-
-                        m_graphics->refresh();
-                    }
-                }
-
-                std::this_thread::sleep_for(std::chrono::milliseconds(16));
-                continue;
-            }
-
-            const int ch = getch();
-
-            if (ch == ERR)
-            {
-                processCommandQueue();
-
-                std::this_thread::sleep_for(std::chrono::milliseconds(10));
-
-                continue;
-            }
-
-            /*
-             * ENTER
-             */
-            if (ch == '\n' || ch == '\r')
-            {
-                if (! currentInput.empty())
-                {
-                    input(currentInput);
-
+                    Kernel::setMode(InputOutputMode::SHELL);
                     currentInput.clear();
-
                     m_graphics->clear();
-
                     for (int i = 0; i < static_cast<int>(m_outputLines.size()); ++i)
                     {
                         mvprintw(i, 0, "%s", m_outputLines[i].c_str());
                     }
-
-                    mvprintw(LINES - 1, 0, "> ");
-
-                    m_graphics->refresh();
-                }
-
+                mvprintw(LINES - 1, 0, "> ");
+                m_graphics->refresh();
                 continue;
             }
 
-            /*
-             * BACKSPACE
-             */
-            if (ch == 127 || ch == KEY_BACKSPACE)
+            auto* screen = Kernel::SCREEN();
+
+            if (screen)
             {
-                if (! currentInput.empty())
+                const int width = m_graphics->getWindowSize().first;
+                const int height = m_graphics->getWindowSize().second;
+                screen->setSize(height, width);
+
+                uint32_t* buffer = screen->getScreen();
+
+                if (buffer && width > 0 && height > 0)
                 {
-                    currentInput.pop_back();
-
                     m_graphics->clear();
-
-                    for (int i = 0; i < static_cast<int>(m_outputLines.size()); ++i)
-                    {
-                        mvprintw(i, 0, "%s", m_outputLines[i].c_str());
-                    }
-
-                    mvprintw(LINES - 1, 0, "> %s", currentInput.c_str());
-
+                    m_graphics->drawScreen(buffer, width, height);
                     m_graphics->refresh();
                 }
-
-                continue;
             }
 
-            /*
-             * Обычный символ.
-             */
-            if (ch >= 32 && ch <= 126)
+            std::this_thread::sleep_for(std::chrono::milliseconds(16));
+            continue;
+        }
+
+        const int ch = getch();
+
+        if (ch == 27)
+        {
+            if (Kernel::getMode() == InputOutputMode::SCREEN)
+                Kernel::setMode(InputOutputMode::SHELL);
+
+            currentInput.clear();
+
+            m_graphics->clear();
+            m_graphics->refresh();
+
+            continue;
+        }
+
+        if (ch == ERR)
+        {
+            processCommandQueue();
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+            continue;
+        }
+
+        /*
+         * ENTER
+         */
+        if (ch == '\n' || ch == '\r')
+        {
+            if (! currentInput.empty())
             {
-                currentInput += static_cast<char>(ch);
+                input(currentInput);
+
+                currentInput.clear();
+
+                m_graphics->clear();
+
+                for (int i = 0; i < static_cast<int>(m_outputLines.size()); ++i)
+                {
+                    mvprintw(i, 0, "%s", m_outputLines[i].c_str());
+                }
+
+                mvprintw(LINES - 1, 0, "> ");
+
+                m_graphics->refresh();
+            }
+
+            continue;
+        }
+
+        /*
+         * BACKSPACE
+         */
+        if (ch == 127 || ch == KEY_BACKSPACE)
+        {
+            if (! currentInput.empty())
+            {
+                currentInput.pop_back();
 
                 m_graphics->clear();
 
@@ -210,11 +213,33 @@ namespace kernel
                 mvprintw(LINES - 1, 0, "> %s", currentInput.c_str());
 
                 m_graphics->refresh();
-
-                continue;
             }
+
+            continue;
+        }
+
+        /*
+         * Обычный символ.
+         */
+        if (ch >= 32 && ch <= 126)
+        {
+            currentInput += static_cast<char>(ch);
+
+            m_graphics->clear();
+
+            for (int i = 0; i < static_cast<int>(m_outputLines.size()); ++i)
+            {
+                mvprintw(i, 0, "%s", m_outputLines[i].c_str());
+            }
+
+            mvprintw(LINES - 1, 0, "> %s", currentInput.c_str());
+
+            m_graphics->refresh();
+
+            continue;
         }
     }
+}
 
     void TerminalShell::processCommandQueue()
     {
@@ -365,9 +390,7 @@ namespace kernel
         return {cols, rows};
     }
 
-    void TerminalGraphics::getTerminalSize(
-        int& rows,
-        int& cols)
+    void TerminalGraphics::getTerminalSize( int& rows, int& cols)
     {
         getmaxyx(stdscr, rows, cols);
     }
