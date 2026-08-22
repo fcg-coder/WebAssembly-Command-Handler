@@ -8,22 +8,6 @@
 
 #include "../commands/command_base.hpp"
 
-namespace FormatUtils
-{
-    static std::string formatString(const char* format, ...)
-    {
-        char buffer[256];
-
-        va_list args;
-        va_start(args, format);
-
-        vsnprintf(buffer, sizeof(buffer), format, args);
-
-        va_end(args);
-
-        return std::string(buffer);
-    }
-} // namespace FormatUtils
 
 #define HISTSIZE   100
 #define HISTFORMAT "%d %s"
