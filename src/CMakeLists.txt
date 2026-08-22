@@ -36,6 +36,26 @@ if(USE_TERMINAL)
 
     add_compile_definitions(USE_TERMINAL)
 
+    # --------------------------------------------
+    # Platform-specific terminal libraries
+    # --------------------------------------------
+
+    if(APPLE)
+
+        message(STATUS "Platform: macOS")
+
+    elseif(UNIX)
+
+        message(STATUS "Platform: Linux")
+
+    else()
+
+        message(FATAL_ERROR
+            "Unsupported platform for TERMINAL version"
+        )
+
+    endif()
+
 elseif(USE_WEBASM)
 
     message(STATUS "================================")
@@ -87,11 +107,22 @@ target_link_libraries(main PRIVATE
 
 if(USE_TERMINAL)
 
+    # ncurses is required on both macOS and Linux.
     target_link_libraries(main PRIVATE
         ncurses
-        pthread
-        rt
     )
+
+    # pthread and rt are Linux-specific.
+    # macOS provides threading functionality through its system libraries
+    # and does not provide a separate librt.
+    if(UNIX AND NOT APPLE)
+
+        target_link_libraries(main PRIVATE
+            pthread
+            rt
+        )
+
+    endif()
 
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 
@@ -108,9 +139,9 @@ if(USE_TERMINAL)
 
     endif()
 
-    # ============================================
-    # WebAssembly
-    # ============================================
+# ============================================
+# WebAssembly
+# ============================================
 
 elseif(USE_WEBASM)
 
