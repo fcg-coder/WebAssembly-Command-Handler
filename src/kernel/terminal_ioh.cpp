@@ -10,22 +10,13 @@ namespace kernel
           m_inputReady(false)
     {
         initscr();
-
         cbreak();
         noecho();
-
         keypad(stdscr, TRUE);
         curs_set(0);
-
         nodelay(stdscr, TRUE);
-
-        m_graphics =
-            std::make_unique<TerminalGraphics>();
-
-        m_inputThread =
-            std::thread(
-                &TerminalShell::inputLoop,
-                this);
+        m_graphics = std::make_unique<TerminalGraphics>();
+        m_inputThread = std::thread(&TerminalShell::inputLoop, this);
     }
 
     TerminalShell::~TerminalShell()
@@ -38,37 +29,24 @@ namespace kernel
         endwin();
     }
 
-    void TerminalShell::inputImpl(
-        const std::string& inputString)
+    void TerminalShell::inputImpl(const std::string& inputString)
     {
-        std::lock_guard<std::mutex> lock(
-            m_queueMutex);
+        std::lock_guard<std::mutex> lock(m_queueMutex);
 
         m_commandQueue.push(inputString);
-
         m_inputReady = true;
-
         m_cv.notify_one();
     }
 
-    void TerminalShell::outputImpl(
-        const std::string& outputString)
+    void TerminalShell::outputImpl(const std::string& outputString)
     {
         if (outputString.empty())
             return;
 
-        /*
-         * SCREEN полностью владеет терминалом.
-         */
-        if (Kernel::getMode() ==
-            InputOutputMode::SCREEN)
-        {
+        if (Kernel::getMode() == InputOutputMode::SCREEN)
             return;
-        }
 
-        std::lock_guard<std::mutex> lock(
-            m_outputMutex);
-
+        std::lock_guard<std::mutex> lock(m_outputMutex);
         std::string line;
 
         for (char c : outputString)
@@ -87,38 +65,21 @@ namespace kernel
         if (! line.empty())
             m_outputLines.push_back(line);
 
-        const int maxOutputLines =
-            std::max(1, LINES - 2);
+        const int maxOutputLines = std::max(1, LINES - 2);
 
-        while (
-            static_cast<int>(
-                m_outputLines.size()) >
-            maxOutputLines)
+        while (static_cast<int>(m_outputLines.size()) > maxOutputLines)
         {
-            m_outputLines.erase(
-                m_outputLines.begin());
+            m_outputLines.erase(m_outputLines.begin());
         }
 
         ::clear();
 
-        for (
-            int i = 0;
-            i < static_cast<int>(
-                    m_outputLines.size());
-            ++i)
+        for (int i = 0; i < static_cast<int>(m_outputLines.size()); ++i)
         {
-            mvprintw(
-                i,
-                0,
-                "%s",
-                m_outputLines[i].c_str());
+            mvprintw(i, 0, "%s", m_outputLines[i].c_str());
         }
 
-        mvprintw(
-            LINES - 1,
-            0,
-            "> %s",
-            m_currentInput.c_str());
+        mvprintw(LINES - 1, 0, "> %s", m_currentInput.c_str());
 
         ::refresh();
     }
@@ -138,20 +99,12 @@ namespace kernel
     {
         std::string currentInput;
 
-        mvprintw(
-            LINES - 1,
-            0,
-            "> ");
+        mvprintw(LINES - 1, 0, "> ");
 
         ::refresh();
 
         while (m_running)
         {
-            /*
-             * ==================================================
-             * SCREEN MODE
-             * ==================================================
-             */
 
             if (Kernel::getMode() == InputOutputMode::SCREEN)
             {
@@ -159,7 +112,6 @@ namespace kernel
 
                 if (screen)
                 {
-
                     const int width = m_graphics->getWindowSize().first;
                     const int height = m_graphics->getWindowSize().second;
                     screen->setSize(height, width);
@@ -170,25 +122,15 @@ namespace kernel
                     {
                         m_graphics->clear();
 
-                        m_graphics->drawScreen(
-                            buffer,
-                            width,
-                            height);
+                        m_graphics->drawScreen(buffer, width, height);
 
                         m_graphics->refresh();
                     }
                 }
 
-                std::this_thread::sleep_for(
-                    std::chrono::milliseconds(16));
-
+                std::this_thread::sleep_for(std::chrono::milliseconds(16));
                 continue;
             }
-            /*
-             * ==================================================
-             * SHELL MODE
-             * ==================================================
-             */
 
             const int ch = getch();
 
@@ -196,8 +138,7 @@ namespace kernel
             {
                 processCommandQueue();
 
-                std::this_thread::sleep_for(
-                    std::chrono::milliseconds(10));
+                std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
                 continue;
             }
@@ -215,23 +156,12 @@ namespace kernel
 
                     m_graphics->clear();
 
-                    for (
-                        int i = 0;
-                        i < static_cast<int>(
-                                m_outputLines.size());
-                        ++i)
+                    for (int i = 0; i < static_cast<int>(m_outputLines.size()); ++i)
                     {
-                        mvprintw(
-                            i,
-                            0,
-                            "%s",
-                            m_outputLines[i].c_str());
+                        mvprintw(i, 0, "%s", m_outputLines[i].c_str());
                     }
 
-                    mvprintw(
-                        LINES - 1,
-                        0,
-                        "> ");
+                    mvprintw(LINES - 1, 0, "> ");
 
                     m_graphics->refresh();
                 }
@@ -242,9 +172,7 @@ namespace kernel
             /*
              * BACKSPACE
              */
-            if (
-                ch == 127 ||
-                ch == KEY_BACKSPACE)
+            if (ch == 127 || ch == KEY_BACKSPACE)
             {
                 if (! currentInput.empty())
                 {
@@ -252,24 +180,12 @@ namespace kernel
 
                     m_graphics->clear();
 
-                    for (
-                        int i = 0;
-                        i < static_cast<int>(
-                                m_outputLines.size());
-                        ++i)
+                    for (int i = 0; i < static_cast<int>(m_outputLines.size()); ++i)
                     {
-                        mvprintw(
-                            i,
-                            0,
-                            "%s",
-                            m_outputLines[i].c_str());
+                        mvprintw(i, 0, "%s", m_outputLines[i].c_str());
                     }
 
-                    mvprintw(
-                        LINES - 1,
-                        0,
-                        "> %s",
-                        currentInput.c_str());
+                    mvprintw(LINES - 1, 0, "> %s", currentInput.c_str());
 
                     m_graphics->refresh();
                 }
@@ -282,29 +198,16 @@ namespace kernel
              */
             if (ch >= 32 && ch <= 126)
             {
-                currentInput +=
-                    static_cast<char>(ch);
+                currentInput += static_cast<char>(ch);
 
                 m_graphics->clear();
 
-                for (
-                    int i = 0;
-                    i < static_cast<int>(
-                            m_outputLines.size());
-                    ++i)
+                for (int i = 0; i < static_cast<int>(m_outputLines.size()); ++i)
                 {
-                    mvprintw(
-                        i,
-                        0,
-                        "%s",
-                        m_outputLines[i].c_str());
+                    mvprintw(i, 0, "%s", m_outputLines[i].c_str());
                 }
 
-                mvprintw(
-                    LINES - 1,
-                    0,
-                    "> %s",
-                    currentInput.c_str());
+                mvprintw(LINES - 1, 0, "> %s", currentInput.c_str());
 
                 m_graphics->refresh();
 
@@ -315,14 +218,11 @@ namespace kernel
 
     void TerminalShell::processCommandQueue()
     {
-        std::lock_guard<std::mutex> lock(
-            m_queueMutex);
+        std::lock_guard<std::mutex> lock(m_queueMutex);
 
         while (! m_commandQueue.empty())
         {
-            const std::string command =
-                m_commandQueue.front();
-
+            const std::string command = m_commandQueue.front();
             m_commandQueue.pop();
 
             Kernel::executeCmd(command);
@@ -360,84 +260,43 @@ namespace kernel
 
             if (COLORS >= 256)
             {
-                const int pairCount =
-                    std::min(240, COLOR_PAIRS - 1);
+                const int pairCount = std::min(240, COLOR_PAIRS - 1);
 
                 for (int i = 0; i < pairCount; ++i)
                 {
                     const int color = 16 + i;
 
-                    init_pair(
-                        i + 1,
-                        color,
-                        color);
+                    init_pair(i + 1, color, color);
                 }
             }
 
             initialized = true;
         }
 
-        /*
-         * RGB -> xterm 256.
-         */
         auto rgbTo256 =
-            [](uint8_t r,
-               uint8_t g,
-               uint8_t b) -> int {
-            const int rr =
-                (static_cast<int>(r) * 5 + 127) / 255;
+            [](uint8_t r, uint8_t g, uint8_t b) -> int {
+            const int rr = (static_cast<int>(r) * 5 + 127) / 255;
 
-            const int gg =
-                (static_cast<int>(g) * 5 + 127) / 255;
+            const int gg = (static_cast<int>(g) * 5 + 127) / 255;
 
-            const int bb =
-                (static_cast<int>(b) * 5 + 127) / 255;
-
-            return 16 +
-                   36 * rr +
-                   6 * gg +
-                   bb;
+            const int bb = (static_cast<int>(b) * 5 + 127) / 255;
+            return 16 + 36 * rr + 6 * gg + bb;
         };
 
-        /*
-         * Каждый пиксель framebuffer
-         * превращается в один видимый блок.
-         */
-        for (int y = 0;
-             y < renderHeight;
-             ++y)
+        for (int y = 0; y < renderHeight; ++y)
         {
-            for (int x = 0;
-                 x < renderWidth;
-                 ++x)
+            for (int x = 0; x < renderWidth; ++x)
             {
-                const uint32_t pixel =
-                    screen[y * width + x];
+                const uint32_t pixel = screen[y * width + x];
 
-                const uint8_t r =
-                    static_cast<uint8_t>(
-                        (pixel >> 16) & 0xFF);
+                const uint8_t r = static_cast<uint8_t>((pixel >> 24) & 0xFF);
+                const uint8_t g = static_cast<uint8_t>((pixel >> 16) & 0xFF);
+                const uint8_t b = static_cast<uint8_t>((pixel >> 8) & 0xFF);
+                const uint8_t a = static_cast<uint8_t>(pixel & 0xFF);
 
-                const uint8_t g =
-                    static_cast<uint8_t>(
-                        (pixel >> 8) & 0xFF);
-
-                const uint8_t b =
-                    static_cast<uint8_t>(
-                        pixel & 0xFF);
-
-                /*
-                 * Чёрный пиксель.
-                 */
-                if (r == 0 &&
-                    g == 0 &&
-                    b == 0)
+                if (r == 0 && g == 0 && b == 0)
                 {
-                    mvaddch(
-                        y,
-                        x,
-                        ' ');
-
+                    mvaddch(y, x, ' ');
                     continue;
                 }
 
@@ -445,65 +304,38 @@ namespace kernel
 
                 if (COLORS >= 256)
                 {
-                    const int color =
-                        rgbTo256(r, g, b);
+                    const int color = rgbTo256(r, g, b);
 
                     pair = color - 15;
 
-                    const int maxPair =
-                        std::min(
-                            240,
-                            COLOR_PAIRS - 1);
+                    const int maxPair = std::min(240, COLOR_PAIRS - 1);
 
-                    pair =
-                        std::clamp(
-                            pair,
-                            1,
-                            maxPair);
+                    pair = std::clamp(pair, 1, maxPair);
                 }
                 else
                 {
-                    /*
-                     * Fallback для 8/16 цветов.
-                     */
-                    if (r > 200 &&
-                        g < 100 &&
-                        b < 100)
+
+                    if (r > 200 && g < 100 && b < 100)
                     {
                         pair = 2;
                     }
-                    else if (
-                        r < 100 &&
-                        g > 200 &&
-                        b < 100)
+                    else if (r < 100 && g > 200 && b < 100)
                     {
                         pair = 3;
                     }
-                    else if (
-                        r > 180 &&
-                        g > 180 &&
-                        b < 100)
+                    else if (r > 180 && g > 180 && b < 100)
                     {
                         pair = 4;
                     }
-                    else if (
-                        r < 100 &&
-                        g < 100 &&
-                        b > 200)
+                    else if (r < 100 && g < 100 && b > 200)
                     {
                         pair = 5;
                     }
-                    else if (
-                        r > 180 &&
-                        g < 100 &&
-                        b > 180)
+                    else if (r > 180 && g < 100 && b > 180)
                     {
                         pair = 6;
                     }
-                    else if (
-                        r < 100 &&
-                        g > 180 &&
-                        b > 180)
+                    else if (r < 100 && g > 180 && b > 180)
                     {
                         pair = 7;
                     }
@@ -513,16 +345,7 @@ namespace kernel
                     }
                 }
 
-                /*
-                 * ВАЖНО:
-                 *
-                 * Не пробел.
-                 * Реально видимый блок.
-                 */
-                mvaddch(
-                    y,
-                    x,
-                    ' ' | COLOR_PAIR(pair));
+                mvaddch(y, x, ' ' | COLOR_PAIR(pair));
             }
         }
     }

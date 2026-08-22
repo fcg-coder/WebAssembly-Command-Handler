@@ -17,6 +17,13 @@ public:
     void render() override;
 };
 
+class Pyramid : public ShapeBase3D
+{
+public:
+    Pyramid();
+    void render() override;
+};
+
 class Gradient : public ShapeBase
 {
 public:

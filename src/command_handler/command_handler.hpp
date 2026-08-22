@@ -19,8 +19,7 @@ namespace kernel
             : history(std::make_unique<History>()),
               commandHelp(std::make_unique<CommandHelp>()),
               commandScreen(std::make_unique<CommandScreen>()),
-              commandShell(std::make_unique<CommandShell>()),
-              commandRotateCube(std::make_unique<CommandRotateCube>())
+              commandShell(std::make_unique<CommandShell>())
         {
         }
 
@@ -30,6 +29,5 @@ namespace kernel
         std::unique_ptr<CommandHelp> commandHelp;
         std::unique_ptr<CommandScreen> commandScreen;
         std::unique_ptr<CommandShell> commandShell;
-        std::unique_ptr<CommandRotateCube> commandRotateCube;
     };
 } // namespace kernel

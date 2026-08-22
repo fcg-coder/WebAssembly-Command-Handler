@@ -10,7 +10,7 @@ class Pixel;
 class Point3D;
 struct Color;
 
-enum class ShapeMode
+enum class isVisible
 {
     OFF,
     ON
@@ -24,7 +24,7 @@ class ShapeBase
 {
 public:
     int layoutIndex;
-    ShapeMode mode = ShapeMode::OFF; // Default value set to OFF
+    isVisible mode = isVisible::OFF; // Default value set to OFF
     virtual void render() = 0;
     virtual ~ShapeBase() = default;
 
@@ -35,6 +35,7 @@ constexpr int VIEWER_DISTANCE = 10000; // Distance from the viewer to the screen
 class Point3D
 {
 public:
+    /* int error */
     double x;
     double y;
     double z;
@@ -85,12 +86,16 @@ class ShapeBase3D : public ShapeBase
 {
 
 public:
-    std::vector<Point3D*> points;
+    std::vector<Point3D> points;
     virtual void render() override = 0;
-    void line3D(Point3D* p1, Point3D* p2, const Color& color)
+
+    virtual ~ShapeBase3D()
     {
-        auto [x1, y1] = p1->projection();
-        auto [x2, y2] = p2->projection();
+    }
+    void line3D(Point3D p1, Point3D p2, const Color& color)
+    {
+        auto [x1, y1] = p1.projection();
+        auto [x2, y2] = p2.projection();
         line(x1, y1, x2, y2, color);
     };
 
@@ -100,9 +105,9 @@ public:
         double centerX = 0, centerY = 0, centerZ = 0;
         for (auto& point : points)
         {
-            centerX += point->x;
-            centerY += point->y;
-            centerZ += point->z;
+            centerX += point.x;
+            centerY += point.y;
+            centerZ += point.z;
         }
         centerX /= points.size();
         centerY /= points.size();
@@ -110,25 +115,25 @@ public:
 
         for (auto& point : points)
         {
-            point->x -= centerX;
-            point->y -= centerY;
-            point->z -= centerZ;
+            point.x -= centerX;
+            point.y -= centerY;
+            point.z -= centerZ;
         }
 
         for (auto& point : points)
         {
-            double y = point->y;
-            double z = point->z;
+            double y = point.y;
+            double z = point.z;
 
-            point->y = y * cos(angle) - z * sin(angle);
-            point->z = y * sin(angle) + z * cos(angle);
+            point.y = y * cos(angle) - z * sin(angle);
+            point.z = y * sin(angle) + z * cos(angle);
         }
 
         for (auto& point : points)
         {
-            point->x += centerX;
-            point->y += centerY;
-            point->z += centerZ;
+            point.x += centerX;
+            point.y += centerY;
+            point.z += centerZ;
         }
     }
 
@@ -137,9 +142,9 @@ public:
         double centerX = 0, centerY = 0, centerZ = 0;
         for (auto& point : points)
         {
-            centerX += point->x;
-            centerY += point->y;
-            centerZ += point->z;
+            centerX += point.x;
+            centerY += point.y;
+            centerZ += point.z;
         }
         centerX /= points.size();
         centerY /= points.size();
@@ -147,25 +152,25 @@ public:
 
         for (auto& point : points)
         {
-            point->x -= centerX;
-            point->y -= centerY;
-            point->z -= centerZ;
+            point.x -= centerX;
+            point.y -= centerY;
+            point.z -= centerZ;
         }
 
         for (auto& point : points)
         {
-            double x = point->x;
-            double z = point->z;
+            double x = point.x;
+            double z = point.z;
 
-            point->x = x * cos(angle) + z * sin(angle);
-            point->z = -x * sin(angle) + z * cos(angle);
+            point.x = x * cos(angle) + z * sin(angle);
+            point.z = -x * sin(angle) + z * cos(angle);
         }
 
         for (auto& point : points)
         {
-            point->x += centerX;
-            point->y += centerY;
-            point->z += centerZ;
+            point.x += centerX;
+            point.y += centerY;
+            point.z += centerZ;
         }
     }
 
@@ -174,9 +179,9 @@ public:
         double centerX = 0, centerY = 0, centerZ = 0;
         for (auto& point : points)
         {
-            centerX += point->x;
-            centerY += point->y;
-            centerZ += point->z;
+            centerX += point.x;
+            centerY += point.y;
+            centerZ += point.z;
         }
         centerX /= points.size();
         centerY /= points.size();
@@ -184,25 +189,25 @@ public:
 
         for (auto& point : points)
         {
-            point->x -= centerX;
-            point->y -= centerY;
-            point->z -= centerZ;
+            point.x -= centerX;
+            point.y -= centerY;
+            point.z -= centerZ;
         }
 
         for (auto& point : points)
         {
-            double x = point->x;
-            double y = point->y;
+            double x = point.x;
+            double y = point.y;
 
-            point->x = x * cos(angle) - y * sin(angle);
-            point->y = x * sin(angle) + y * cos(angle);
+            point.x = x * cos(angle) - y * sin(angle);
+            point.y = x * sin(angle) + y * cos(angle);
         }
 
         for (auto& point : points)
         {
-            point->x += centerX;
-            point->y += centerY;
-            point->z += centerZ;
+            point.x += centerX;
+            point.y += centerY;
+            point.z += centerZ;
         }
     }
 };

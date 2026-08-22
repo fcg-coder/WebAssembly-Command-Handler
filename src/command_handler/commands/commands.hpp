@@ -45,16 +45,3 @@ public:
     void man() override;
     void description() override;
 };
-
-class CommandRotateCube : public ICommand, public CommandRegister
-{
-public:
-    CommandRotateCube()
-        : ICommand("rotate_cube"), CommandRegister(this)
-    {
-    }
-
-    void execute() override;
-    void man() override;
-    void description() override;
-};

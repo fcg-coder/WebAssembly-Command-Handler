@@ -16,7 +16,7 @@ namespace kernel
      * @b PIMPL + template
      */
     template <typename ShellType, typename ScreenType, typename CommandHandlerType>
-    class KernelImpl
+    class KernelImpl final
     {
     public:
         KernelImpl(ShellType& ioh, ScreenType& screen, CommandHandlerType& commandHandler)

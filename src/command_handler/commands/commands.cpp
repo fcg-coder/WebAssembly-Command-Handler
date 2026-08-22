@@ -8,7 +8,7 @@ void CommandHelp::execute()
 
     for (const auto& [commandName, command] : commandMap)
     {
-        Kernel::IOH()->output(commandName + "\n");
+        Kernel::IOH()->output(commandName);
         command->description();
     }
 }
@@ -44,18 +44,4 @@ void CommandShell::man()
 void CommandShell::description()
 {
     Kernel::IOH()->output("\tThis command is used to switch to shell mode.");
-}
-void CommandRotateCube::execute()
-{
-    // double angle = 3.0 * M_PI / 180.0;
-    // dynamic_cast<ShapeBase3D*>(Screen::getInstance().getObject("cube"))->rotateX(angle);
-    // dynamic_cast<ShapeBase3D*>(Screen::getInstance().getObject("cube"))->rotateY(angle);
-    // dynamic_cast<ShapeBase3D*>(Screen::getInstance().getObject("cube"))->rotateZ(angle);
-}
-void CommandRotateCube::man()
-{
-}
-void CommandRotateCube::description()
-{
-    Kernel::IOH()->output("\tThis command is used to rotate the cube.");
 }

@@ -27,7 +27,7 @@ namespace kernel
 
     private:
         Screen();
-
+        static inline bool isInited = false;
         void initializeScene();
         void renderObjects();
         void render();

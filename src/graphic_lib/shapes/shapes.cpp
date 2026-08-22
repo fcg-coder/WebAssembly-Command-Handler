@@ -1,6 +1,8 @@
 
 #include "shapes.hpp"
 #include "../../kernel/kernel.hpp"
+#include <random>
+
 void Gradient::render()
 {
     auto [width, height] = Kernel::SCREEN()->getSize();
@@ -49,28 +51,41 @@ Cube::Cube()
     int offsetZ = 10;  // Center offset on the Z-axis
 
     points = {
-        new Point3D(-size + offsetX, -size + offsetY, size + offsetZ),
-        new Point3D(size + offsetX, -size + offsetY, size + offsetZ),
-        new Point3D(size + offsetX, size + offsetY, size + offsetZ),
-        new Point3D(-size + offsetX, size + offsetY, size + offsetZ),
-        new Point3D(-size + offsetX, -size + offsetY, -size + offsetZ),
-        new Point3D(size + offsetX, -size + offsetY, -size + offsetZ),
-        new Point3D(size + offsetX, size + offsetY, -size + offsetZ),
-        new Point3D(-size + offsetX, size + offsetY, -size + offsetZ)};
+        Point3D(-size + offsetX, -size + offsetY, size + offsetZ),
+        Point3D(size + offsetX, -size + offsetY, size + offsetZ),
+        Point3D(size + offsetX, size + offsetY, size + offsetZ),
+        Point3D(-size + offsetX, size + offsetY, size + offsetZ),
+        Point3D(-size + offsetX, -size + offsetY, -size + offsetZ),
+        Point3D(size + offsetX, -size + offsetY, -size + offsetZ),
+        Point3D(size + offsetX, size + offsetY, -size + offsetZ),
+        Point3D(-size + offsetX, size + offsetY, -size + offsetZ)};
 
     layoutIndex = 1;
 
-    mode = ShapeMode::ON;
+    mode = isVisible::ON;
+}
+
+static inline bool randomBool()
+{
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    static std::bernoulli_distribution dist(0.5);
+
+    return dist(gen);
 }
 
 void Cube::render()
 {
-    // Point3D::setProjectionMethod(&Point3D::perspectiveProjection);
-    Point3D::setProjectionMethod(&Point3D::orthographicProjection);
+    Point3D::setProjectionMethod(&Point3D::perspectiveProjection);
+    // Point3D::setProjectionMethod(&Point3D::orthographicProjection);
     double angle = 2.0 * M_PI / 180.0;
-    rotateX(angle);
-    rotateY(angle);
-    rotateZ(angle);
+
+    if (randomBool())
+        rotateX(angle);
+    if (randomBool())
+        rotateY(angle);
+    if (randomBool())
+        rotateZ(angle);
 
     line3D(points[0], points[1], Color::White());
     line3D(points[1], points[2], Color::White());
@@ -91,20 +106,68 @@ void Cube::render()
 CoordinateSystem::CoordinateSystem()
 {
     points = {
-        new Point3D(0, 0, 0),
-        new Point3D(1000, 0, 0),
-        new Point3D(0, 1000, 0),
-        new Point3D(0, 0, 10000000)};
+        Point3D(0, 0, 0),
+        Point3D(1000, 0, 0),
+        Point3D(0, 1000, 0),
+        Point3D(0, 0, 10000000)};
     layoutIndex = 998;
 
-    mode = ShapeMode::ON;
+    mode = isVisible::ON;
 }
 
 void CoordinateSystem::render()
 {
-    Point3D::setProjectionMethod(&Point3D::perspectiveProjection);
+    Point3D::setProjectionMethod(&Point3D::orthographicProjection);
 
     line3D(points[0], points[1], Color::Gray()); // X-axis
     line3D(points[0], points[2], Color::Gray()); // Y-axis
     line3D(points[0], points[3], Color::Gray()); // Z-axis
+}
+
+Pyramid::Pyramid()
+{
+    int size = 30;
+
+    int offsetX = 150;
+    int offsetY = 50;
+    int offsetZ = 0;
+
+    // Base square + top point
+    points = {
+        // Base
+        Point3D(-size + offsetX, -size + offsetY, size + offsetZ),
+        Point3D(size + offsetX, -size + offsetY, size + offsetZ),
+        Point3D(size + offsetX, size + offsetY, size + offsetZ),
+        Point3D(-size + offsetX, size + offsetY, size + offsetZ),
+
+        // Apex
+        Point3D(offsetX, offsetY, -size + offsetZ)};
+
+    layoutIndex = 2;
+    mode = isVisible::ON;
+}
+
+void Pyramid::render()
+{
+    Point3D::setProjectionMethod(&Point3D::perspectiveProjection);
+
+    double angle = 2.0 * M_PI / 180.0;
+
+    rotateX(angle);
+    rotateY(angle);
+    rotateZ(angle);
+
+    Color color = Color::White();
+
+    // Base square
+    line3D(points[0], points[1], color);
+    line3D(points[1], points[2], color);
+    line3D(points[2], points[3], color);
+    line3D(points[3], points[0], color);
+
+    // Pyramid sides
+    line3D(points[0], points[4], color);
+    line3D(points[1], points[4], color);
+    line3D(points[2], points[4], color);
+    line3D(points[3], points[4], color);
 }

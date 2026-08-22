@@ -9,7 +9,6 @@ namespace kernel
         for (int y = 0; y < MAX_HEIGHT; ++y)
         {
             const int offset = y * MAX_WIDTH;
-
             for (int x = 0; x < MAX_WIDTH; ++x)
             {
                 pixels[y][x] = Pixel(x, y, 0, 0, 0, 0);
@@ -17,11 +16,12 @@ namespace kernel
                 screenBuff[offset + x] = pixels[y][x].serialize();
             }
         }
-        initializeScene();
     }
 
     uint32_t* Screen::getScreen()
     {
+        if (! isInited)
+            initializeScene();
         clearScreen();
         render();
 
@@ -62,23 +62,23 @@ namespace kernel
 
     std::pair<int, int> Screen::getSize()
     {
-        return {
-            static_cast<int>(m_windowWidth),
-            static_cast<int>(m_windowHeight)};
+        return {static_cast<int>(m_windowWidth), static_cast<int>(m_windowHeight)};
     }
 
     void Screen::initializeScene()
     {
-
+        addObject("Pyramid", new Pyramid());
         addObject("cube", new Cube());
-        // addObject("Gradient", new Gradient());
+        addObject("Gradient", new Gradient());
+        addObject("Square", new Square());
+        isInited = true;
     }
 
     void Screen::renderObjects()
     {
         for (auto& [key, shape] : m_scene)
         {
-            if (shape && shape->mode == ShapeMode::ON)
+            if (shape && shape->mode == isVisible::ON)
             {
                 shape->render();
             }
@@ -89,22 +89,11 @@ namespace kernel
     {
         renderObjects();
 
-        const int width = std::min(
-            static_cast<int>(m_windowWidth),
-            static_cast<int>(MAX_WIDTH));
+        const int width = std::min(static_cast<int>(m_windowWidth), static_cast<int>(MAX_WIDTH));
+        const int height = std::min(static_cast<int>(m_windowHeight), static_cast<int>(MAX_HEIGHT));
+        const int bufferSize = std::min(width * height, static_cast<int>(MAX_SIZE));
 
-        const int height = std::min(
-            static_cast<int>(m_windowHeight),
-            static_cast<int>(MAX_HEIGHT));
-
-        const int bufferSize = std::min(
-            width * height,
-            static_cast<int>(MAX_SIZE));
-
-        std::fill_n(
-            screenBuff,
-            bufferSize,
-            0x00000000);
+        std::fill_n(screenBuff, bufferSize, 0x00000000);
 
         for (int y = 0; y < height; ++y)
         {
@@ -124,13 +113,8 @@ namespace kernel
 
     void Screen::clearScreen()
     {
-        const int width = std::min(
-            static_cast<int>(m_windowWidth),
-            static_cast<int>(MAX_WIDTH));
-
-        const int height = std::min(
-            static_cast<int>(m_windowHeight),
-            static_cast<int>(MAX_HEIGHT));
+        const int width = std::min(static_cast<int>(m_windowWidth), static_cast<int>(MAX_WIDTH));
+        const int height = std::min(static_cast<int>(m_windowHeight), static_cast<int>(MAX_HEIGHT));
 
         for (int y = 0; y < height; ++y)
         {
