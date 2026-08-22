@@ -12,11 +12,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 option(USE_TERMINAL "Build terminal version" ON)
 option(USE_WEBASM "Build WebAssembly version" OFF)
 
-if(USE_WEBASM)
-    add_compile_definitions(USE_WEBASM)
-endif()
-
-
 if(USE_TERMINAL AND USE_WEBASM)
     message(FATAL_ERROR
         "USE_TERMINAL and USE_WEBASM cannot be enabled together"
@@ -30,12 +25,41 @@ if(NOT USE_TERMINAL AND NOT USE_WEBASM)
 endif()
 
 # ============================================
-# Platform
+# Platform / Global flags
 # ============================================
 
-if(UNIX AND NOT APPLE)
-    set(LINUX TRUE)
+if(USE_TERMINAL)
+
+    message(STATUS "================================")
+    message(STATUS "Building TERMINAL version")
+    message(STATUS "================================")
+
+    add_compile_definitions(USE_TERMINAL)
+
+elseif(USE_WEBASM)
+
+    message(STATUS "================================")
+    message(STATUS "Building WEBASSEMBLY version")
+    message(STATUS "================================")
+
+    if(NOT EMSCRIPTEN)
+        message(FATAL_ERROR
+            "USE_WEBASM requires the Emscripten toolchain"
+        )
+    endif()
+
+    add_compile_definitions(USE_WEBASM)
+
 endif()
+
+# ============================================
+# Global compiler warnings
+# ============================================
+
+add_compile_options(
+    -Wall
+    -Wextra
+)
 
 # ============================================
 # Main
@@ -63,13 +87,6 @@ target_link_libraries(main PRIVATE
 
 if(USE_TERMINAL)
 
-    message(STATUS "================================")
-    message(STATUS "Building TERMINAL version")
-    message(STATUS "================================")
-
-    target_compile_definitions(main PRIVATE USE_TERMINAL)
-    target_compile_definitions(kernel PRIVATE USE_TERMINAL)
-
     target_link_libraries(main PRIVATE
         ncurses
         pthread
@@ -77,18 +94,18 @@ if(USE_TERMINAL)
     )
 
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-        target_compile_options(main PRIVATE
+
+        add_compile_options(
             -g
             -O0
-            -Wall
-            -Wextra
         )
+
     else()
-        target_compile_options(main PRIVATE
+
+        add_compile_options(
             -O2
-            -Wall
-            -Wextra
         )
+
     endif()
 
     # ============================================
@@ -97,24 +114,8 @@ if(USE_TERMINAL)
 
 elseif(USE_WEBASM)
 
-    message(STATUS "================================")
-    message(STATUS "Building WEBASSEMBLY version")
-    message(STATUS "================================")
-
-    target_compile_definitions(main PRIVATE USE_WEBASM)
-    target_compile_definitions(kernel PRIVATE USE_WEBASM)
-
     set_target_properties(main PROPERTIES
         SUFFIX ".html"
-    )
-
-    target_compile_options(main PRIVATE
-        -sWASM=1
-        -sALLOW_MEMORY_GROWTH=1
-        -sINITIAL_MEMORY=128MB
-        -sMAXIMUM_MEMORY=4GB
-        -sEXPORTED_RUNTIME_METHODS=ccall,cwrap,HEAP8,HEAP16,HEAP32,HEAPU8,HEAPU16,HEAPU32,HEAPF32,HEAPF64
-        -sEXPORTED_FUNCTIONS=_main,_getMode,_getScreen,_processInput,_setSize,_pressButton,_initScreen,_printToJS
     )
 
     target_link_options(main PRIVATE
@@ -123,7 +124,7 @@ elseif(USE_WEBASM)
         -sINITIAL_MEMORY=128MB
         -sMAXIMUM_MEMORY=4GB
         -sEXPORTED_RUNTIME_METHODS=ccall,cwrap,HEAP8,HEAP16,HEAP32,HEAPU8,HEAPU16,HEAPU32,HEAPF32,HEAPF64
-        -sEXPORTED_FUNCTIONS=_main,_getMode,_getScreen,_processInput,_setSize,_pressButton,_initScreen,_printToJS
+        -sEXPORTED_FUNCTIONS=_main,_getMode,_getScreen,_output,_input,_setSize
     )
 
 endif()

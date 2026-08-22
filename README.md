@@ -1,11 +1,41 @@
-
 # WebAssembly Command Handler
 
-This project is a C++ application using WebAssembly (Emscripten) that enables command handling through the browser.
+# Build
 
-### Technologies Used
-- **WebAssembly**: To execute C++ code in the browser.
-- **Docker**: For creating an isolated build and runtime environment.
-- **C++**: The main programming language of the project.
-- **Emscripten**: To compile C++ code into WebAssembly.
- 
+```bash
+mkdir build
+cd build
+```
+
+## WebAssembly
+
+Собираем CMake + make. Получаем .js файл который подключается к html странице. Копируем файлы из page в build и запускаем сервер 
+
+```bash
+source ~/emsdk/emsdk_env.sh
+emcmake cmake ../src -DUSE_TERMINAL=OFF -DUSE_WEBASM=ON
+make
+cp ../page/index.html ../page/styles.css ../page/webasm.js .
+cp ../page/fonts/*.ttf .
+```
+
+Из корня проекта:
+
+```bash
+python3 server.py
+```
+
+## Terminal
+
+### Linux / macOS
+
+```bash
+cmake ../src -DUSE_TERMINAL=ON -DUSE_WEBASM=OFF
+make 
+```
+
+Запустить 
+
+```sh
+./main
+```

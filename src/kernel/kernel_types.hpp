@@ -2,15 +2,32 @@
 
 #include "../graphic_lib/screen.hpp"
 #include "../command_handler/command_handler.hpp"
-#include "terminal_ioh.hpp"
-// #    include "web_ioh.hpp"
+
+#ifdef USE_WEBASM
+#    include "web_ioh.hpp"
+#elif defined(USE_TERMINAL)
+#    include "terminal_ioh.hpp"
+#endif
 
 namespace kernel
 {
-    using ScreenType = Screen;
     using CommandHandlerType = CommandHandler;
+    using ScreenType = Screen;
+
+#ifdef USE_WEBASM
+
+    class WebAsmShell;
+    using ShellType = WebAsmShell;
+
+#elif defined(USE_TERMINAL)
+
     class TerminalShell;
     using ShellType = TerminalShell;
-    //     using ShellType = WebAsmShell;
+
+#else
+
+#    error "Either USE_WEBASM or USE_TERMINAL must be defined"
+
+#endif
 
 } // namespace kernel

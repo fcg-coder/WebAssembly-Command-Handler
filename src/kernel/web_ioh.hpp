@@ -4,11 +4,15 @@
 #include <cstdint>
 
 #include <emscripten.h>
-
-#include "shell_base.hpp"
 #include "kernel.hpp"
 
-// extern "C" EMSCRIPTEN_KEEPALIVE kernel::InputOutputMode getMode();
+#include "shell_base.hpp"
+
+namespace kernel
+{
+    enum class InputOutputMode;
+}
+extern "C" EMSCRIPTEN_KEEPALIVE kernel::InputOutputMode getMode();
 
 extern "C" EMSCRIPTEN_KEEPALIVE uint32_t* getScreen();
 
