@@ -35,7 +35,6 @@ namespace scene
         std::unordered_map<std::string,std::unique_ptr<ShapeBase>> m_objects;
     };
 
-
     class SceneRegister final
     {
     public:

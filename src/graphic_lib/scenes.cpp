@@ -3,22 +3,29 @@
 
 #include <memory>
 
+#include "../kernel/kernel.hpp"
+
 namespace kernel
 {
     void Screen::initializeScene()
     {
-        auto pyramidScene = std::make_unique<scene::Scene>();
-        auto cubeScene = std::make_unique<scene::Scene>();
+        auto singleObjectScene = [this](const std::string& sceneName, const std::string& objectName, auto object)
+            {
+                auto scene = std::make_unique<scene::Scene>();
+                scene->addObject(objectName, std::move(object));
+                m_scenes.add(sceneName,std::move(scene));
+                Kernel::IOH()->output("Load scene %s", sceneName.c_str());
+            };
 
-        pyramidScene->addObject("Pyramid",std::make_unique<Pyramid>());
+        singleObjectScene("pyramid","Pyramid",std::make_unique<Pyramid>());
 
-        cubeScene->addObject("Cube", std::make_unique<Cube>());
+        singleObjectScene("cube","Cube",std::make_unique<Cube>());
 
-        m_scenes.add("pyramidScene",std::move(pyramidScene));
+        singleObjectScene("spline","Spline2D",std::make_unique<Spline2D>());
 
-        m_scenes.add("cubeScene",std::move(cubeScene) );
+        singleObjectScene("sphere","RayTracedSphere",std::make_unique<RayTracedSphere>());
 
-        m_scenes.load("cubeScene");
+        m_scenes.load("spline");
 
         isInited = true;
     }

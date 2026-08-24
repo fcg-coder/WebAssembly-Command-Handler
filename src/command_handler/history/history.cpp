@@ -12,22 +12,22 @@ static std::string formatString(const char* format, ...)
     return std::string(buffer);
 }
 
-void History::description()
+void CommandHistory::description()
 {
     Kernel::IOH()->output("\tHistory of commands executed\n");
 }
 
-void History::man()
+void CommandHistory::man()
 {
     Kernel::IOH()->output("\tThis command is used to display the history of commands executed.\n");
 }
 
-void History::execute()
+void CommandHistory::execute(const std::vector<std::string>& args)
 {
     printHistory();
 }
 
-void History::printHistory()
+void CommandHistory::printHistory()
 {
     auto queue = commandQueue;
 
@@ -39,7 +39,7 @@ void History::printHistory()
     }
 }
 
-void History::addCommand(ICommand* command, std::string name)
+void CommandHistory::addCommand(ICommand* command, std::string name)
 {
     if (commandQueue.size() >= HISTSIZE)
     {

@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <string>
 #include <utility>
+#include <vector>
 
 class ICommand
 {
@@ -14,7 +15,7 @@ public:
 
     virtual ~ICommand() = default;
 
-    virtual void execute() = 0;
+    virtual void execute(const std::vector<std::string>& args = {}) = 0;
     virtual void man() = 0;
     virtual void description() = 0;
 

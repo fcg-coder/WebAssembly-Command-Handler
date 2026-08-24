@@ -12,17 +12,17 @@
 #define HISTSIZE   100
 #define HISTFORMAT "%d %s"
 
-class History : public ICommand, public CommandRegister
+class CommandHistory : public ICommand, public CommandRegister
 {
 
 public:
-    History()
+    CommandHistory()
         : ICommand("history"), CommandRegister(this) {
           };
     void addCommand(ICommand* command, std::string name);
     void printHistory();
 
-    void execute() override;
+    void execute(const std::vector<std::string>& args = {}) override;
     void man() override;
     void description() override;
 

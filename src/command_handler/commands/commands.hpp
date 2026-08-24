@@ -15,7 +15,7 @@ public:
     {
     }
 
-    void execute() override;
+    void execute(const std::vector<std::string>& args = {}) override;
     void man() override;
     void description() override;
 };
@@ -28,7 +28,7 @@ public:
     {
     }
 
-    void execute() override;
+    void execute(const std::vector<std::string>& args = {}) override;
     void man() override;
     void description() override;
 };
@@ -41,36 +41,21 @@ public:
     {
     }
 
-    void execute() override;
+    void execute(const std::vector<std::string>& args = {}) override;
     void man() override;
     void description() override;
 };
 
-class CommandLoadSceneCube : public ICommand, public CommandRegister
+class CommandLoadScene : public ICommand, public CommandRegister
 {
 public:
-    CommandLoadSceneCube()
-        : ICommand("load_scene_cube"), CommandRegister(this)
+    CommandLoadScene()
+        : ICommand("load_scene"), CommandRegister(this)
     {
     }
 
-    void execute() override;
+    void execute(const std::vector<std::string>& args = {}) override;
     void man() override;
     void description() override;
 };
 
-/*
- * @todo парсить аргументы в input
- */
-class CommandLoadScenePyramid : public ICommand, public CommandRegister
-{
-public:
-    CommandLoadScenePyramid()
-        : ICommand("load_scene_pyramid"), CommandRegister(this)
-    {
-    }
-
-    void execute() override;
-    void man() override;
-    void description() override;
-};

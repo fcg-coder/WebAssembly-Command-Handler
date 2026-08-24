@@ -2,7 +2,7 @@
 #include "../../graphic_lib/screen.hpp"
 #include "../../kernel/kernel.hpp"
 
-void CommandHelp::execute()
+void CommandHelp::execute(const std::vector<std::string>& args)
 {
     const auto& commandMap = CommandRegister::getCommands();
 
@@ -22,7 +22,7 @@ void CommandHelp::description()
     Kernel::IOH()->output("\tThis command is used to display the list of available commands.");
 }
 
-void CommandScreen::execute()
+void CommandScreen::execute(const std::vector<std::string>& args)
 {
     Kernel::setMode(kernel::InputOutputMode::SCREEN);
 }
@@ -34,7 +34,7 @@ void CommandScreen::description()
 {
     Kernel::IOH()->output("\tThis command is used to switch to screen mode.");
 }
-void CommandShell::execute()
+void CommandShell::execute(const std::vector<std::string>& args)
 {
     Kernel::setMode(kernel::InputOutputMode::SHELL);
 }
@@ -47,46 +47,40 @@ void CommandShell::description()
 }
 
 
-void CommandLoadSceneCube::execute()
+void CommandLoadScene::execute(const std::vector<std::string>& args)
 {
     auto* screen = Kernel::SCREEN();
 
     if (!screen)
         return;
 
-    screen->loadScene("cubeScene");
-    Kernel::setMode(kernel::InputOutputMode::SCREEN);
+    if (args.size() != 1)
+    {
+        Kernel::IOH()->output("Usage: load_scene <scene_name>\n");
+        return;
+    }
+
+    if (args[0].empty())
+    {
+        Kernel::IOH()->output("Scene name cannot be empty.\n");
+        return;
+    }
+
+    if (screen->loadScene(args[0])) {
+        Kernel::setMode(kernel::InputOutputMode::SCREEN);
+    }
+    else {
+        Kernel::IOH()->output("Unknown scene\n");
+    }
 }
 
-void CommandLoadSceneCube::man()
+void CommandLoadScene::man()
 {
 
 }
 
-void CommandLoadSceneCube::description()
+void CommandLoadScene::description()
 {
     Kernel::IOH()->output("\tLoad and display the cube scene.");
 }
 
-
-void CommandLoadScenePyramid::execute()
-{
-    auto* screen = Kernel::SCREEN();
-
-    if (!screen)
-        return;
-    screen->loadScene("pyramidScene");
-    Kernel::setMode(kernel::InputOutputMode::SCREEN);
-
-}
-
-void CommandLoadScenePyramid::man()
-{
-
-}
-
-
-void CommandLoadScenePyramid::description()
-{
-    Kernel::IOH()->output("\tLoad and display the pyramid scene.");
-}
