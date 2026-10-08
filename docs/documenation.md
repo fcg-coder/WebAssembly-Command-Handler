@@ -6,14 +6,14 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Docker: Build and Run Container",
+            "label": "Docker: Container Build Up",
             "type": "shell",
-            "command": "rm -rf build && docker compose down && docker compose up --build",
+            "command": "docker compose down && docker compose --profile build run --rm webasm && docker compose up -d --build web",
             "group": {
                 "kind": "build"
             },
             "problemMatcher": [],
-            "isBackground": false,
+            "isBackground": true,
             "runOptions": {
                 "reevaluateOnRerun": true,
                 "promptOnClose": false
@@ -24,11 +24,10 @@
             "type": "shell",
             "command": "rm -rf build && mkdir build && cd build && cmake ../src -DUSE_TERMINAL=ON -DUSE_WEBASM=OFF && make -j6",
             "group": {
-                "kind": "build",
-                "isDefault": true
+                "kind": "build"
             },
             "problemMatcher": [],
-            "isBackground": false,
+            "isBackground": true,
             "runOptions": {
                 "reevaluateOnRerun": true,
                 "promptOnClose": false
@@ -42,7 +41,7 @@
                 "kind": "build"
             },
             "problemMatcher": [],
-            "isBackground": false,
+            "isBackground": true,
             "runOptions": {
                 "reevaluateOnRerun": true,
                 "promptOnClose": false
@@ -52,6 +51,7 @@
             "label": "Run: Linux Terminal",
             "type": "shell",
             "command": "./build/main",
+            "dependsOn": "CMake: Build Linux",
             "problemMatcher": [],
             "isBackground": false,
             "runOptions": {
@@ -63,6 +63,7 @@
             "label": "Run: WebAsm",
             "type": "shell",
             "command": "python3 server.py",
+            "dependsOn": "CMake: Build WebAsm",
             "problemMatcher": [],
             "isBackground": true,
             "runOptions": {

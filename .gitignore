@@ -7,3 +7,4 @@ src/CMakeFiles
 src/CMakeCache.txt
 .qodo
 .idea
+frontend/node_modules

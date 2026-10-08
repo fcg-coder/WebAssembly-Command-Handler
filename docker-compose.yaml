@@ -1,6 +1,25 @@
-version: "3.8"  
 services:
   webasm:
-    build: .
+    build:
+      context: ./src
+      dockerfile: Dockerfile
+    image: wasm-builder:latest
+    container_name: wasm-builder
+    volumes:
+      - wasm-artifacts:/webasm
+    profiles: ["build"]
+
+  web:
+    build:
+      context: .
+      dockerfile: ./frontend/Dockerfile
+    image: docs-web:latest
+    container_name: docs-web
     ports:
-      - "8080:80"   
+      - "8081:80"
+    volumes:
+      - wasm-artifacts:/usr/share/nginx/html/wasm
+    restart: unless-stopped
+
+volumes:
+  wasm-artifacts:

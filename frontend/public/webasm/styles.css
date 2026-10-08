@@ -1,0 +1,69 @@
+@font-face {
+    font-family: 'UbuntuMono-Regular';
+    src: url('UbuntuMono-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+html {
+    font-family: UbuntuMono-Regular, Arial;
+}
+
+body {
+    background-color: black;
+    color: white;
+    font-size: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+    line-height: 1;
+}
+
+#output {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    flex-grow: 1;
+    padding: 10px;
+    overflow-y: auto;
+}
+
+.hidden {
+    display: none;
+}
+
+#canvas-container {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+#canvas {
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+}
+
+#input {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 100;
+
+    background-color: black;
+    color: white;
+    border: none;
+    font-family: monospace;
+    font-size: 1em;
+    padding: 10px;
+    outline: none;
+    box-sizing: border-box;
+}
