@@ -44,9 +44,11 @@ namespace kernel
             history->addCommand( it->second, input  );
             return;
         }
+        else
+        {
 
-        Kernel::IOH()->output( "\nUnknown command %s. Use help", commandName.c_str());
-
+            Kernel::IOH()->output("\nUnknown command %s.\nUse help", command.c_str());
+        }
     }
 
 } // namespace kernel

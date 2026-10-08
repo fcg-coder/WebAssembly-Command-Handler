@@ -1,7 +1,7 @@
 // src/graphic_lib/shapes/shapes.hpp
 #pragma once
 
-#include "shape_base.hpp"
+#include "../graphic_lib/shapes/shape_base.hpp"
 
 class Cube : public ShapeBase3D
 {
@@ -38,15 +38,16 @@ public:
     void render() override;
 };
 
-
-class Spline2D : public ShapeBase {
+class Spline2D : public ShapeBase
+{
 public:
     Spline2D();
 
     void render() override;
 
 private:
-    struct ControlPoint {
+    struct ControlPoint
+    {
         double x;
         double y;
     };
@@ -57,15 +58,16 @@ private:
     void drawSpline();
 };
 
-
-class RayTracedSphere : public ShapeBase {
+class RayTracedSphere : public ShapeBase
+{
 public:
     RayTracedSphere();
 
     void render() override;
 
 private:
-    struct Vec3 {
+    struct Vec3
+    {
         double x;
         double y;
         double z;
@@ -79,12 +81,14 @@ private:
         Vec3 normalized() const;
     };
 
-    struct Ray {
+    struct Ray
+    {
         Vec3 origin;
         Vec3 direction;
     };
 
-    struct Sphere {
+    struct Sphere
+    {
         Vec3 center;
         double radius;
     };
@@ -94,9 +98,7 @@ private:
     Vec3 camera;
     Vec3 light;
 
-    bool intersect(const Ray& ray,const Sphere& sphere,double& distance) const;
+    bool intersect(const Ray& ray, const Sphere& sphere, double& distance) const;
 
-    Pixel calculatePixel(const Vec3& point,const Vec3& normal) const;
+    Pixel calculatePixel(const Vec3& point, const Vec3& normal) const;
 };
-
-

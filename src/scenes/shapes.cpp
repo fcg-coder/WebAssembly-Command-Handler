@@ -1,23 +1,26 @@
 #include "shapes.hpp"
-#include "../../kernel/kernel.hpp"
+#include "../kernel/kernel.hpp"
 #include <random>
 #include <algorithm>
 #include <cmath>
 #include <algorithm>
 
-
-namespace {
+namespace
+{
     int cubeWidth = 0;
     int cubeHeight = 0;
     int pyramidWidth = 0;
     int pyramidHeight = 0;
-}
+} // namespace
 
-void Gradient::render() {
+void Gradient::render()
+{
     auto [width, height] = Kernel::SCREEN()->getSize();
 
-    for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
+    for (int y = 0; y < height; y++)
+    {
+        for (int x = 0; x < width; x++)
+        {
             uint8_t r = static_cast<uint8_t>(255 * (0.5f + 0.5f * sin(x * 0.02f)));
             uint8_t g = static_cast<uint8_t>(255 * (0.5f + 0.5f * cos(y * 0.02f)));
             uint8_t b = static_cast<uint8_t>(255 * (0.5f + 0.5f * sin((x + y) * 0.015f)));
@@ -30,7 +33,8 @@ void Gradient::render() {
     }
 }
 
-void Square::render() {
+void Square::render()
+{
     auto [width, height] = Kernel::SCREEN()->getSize();
 
     const int size = 100;
@@ -48,8 +52,8 @@ void Square::render() {
     line(centerX + half, centerY - half, centerX + half, centerY + half, borderColor);
 }
 
-
-static inline bool randomBool() {
+static inline bool randomBool()
+{
     static std::random_device rd;
     static std::mt19937 gen(rd());
     static std::bernoulli_distribution dist(0.5);
@@ -60,7 +64,8 @@ static inline bool randomBool() {
 /*
  * @todo !
  */
-Cube::Cube() {
+Cube::Cube()
+{
     auto [width, height] = Kernel::SCREEN()->getSize();
 
     cubeWidth = width;
@@ -79,22 +84,21 @@ Cube::Cube() {
         Point3D(-size + offsetX, -size + offsetY, -size + offsetZ),
         Point3D(size + offsetX, -size + offsetY, -size + offsetZ),
         Point3D(size + offsetX, size + offsetY, -size + offsetZ),
-        Point3D(-size + offsetX, size + offsetY, -size + offsetZ)
-    };
+        Point3D(-size + offsetX, size + offsetY, -size + offsetZ)};
 
     layoutIndex = 1;
     mode = isVisible::ON;
 }
 
-
-
 /*
  * @todo !
  */
-void Cube::render() {
+void Cube::render()
+{
     auto [width, height] = Kernel::SCREEN()->getSize();
 
-    if (width != cubeWidth || height != cubeHeight) {
+    if (width != cubeWidth || height != cubeHeight)
+    {
         cubeWidth = width;
         cubeHeight = height;
 
@@ -111,8 +115,7 @@ void Cube::render() {
             Point3D(-size + offsetX, -size + offsetY, -size + offsetZ),
             Point3D(size + offsetX, -size + offsetY, -size + offsetZ),
             Point3D(size + offsetX, size + offsetY, -size + offsetZ),
-            Point3D(-size + offsetX, size + offsetY, -size + offsetZ)
-        };
+            Point3D(-size + offsetX, size + offsetY, -size + offsetZ)};
     }
 
     Point3D::setProjectionMethod(&Point3D::perspectiveProjection);
@@ -144,19 +147,20 @@ void Cube::render() {
     line3D(points[3], points[7], Color::White());
 }
 
-CoordinateSystem::CoordinateSystem() {
+CoordinateSystem::CoordinateSystem()
+{
     points = {
         Point3D(0, 0, 0),
         Point3D(1000, 0, 0),
         Point3D(0, 1000, 0),
-        Point3D(0, 0, 10000000)
-    };
+        Point3D(0, 0, 10000000)};
 
     layoutIndex = 998;
     mode = isVisible::ON;
 }
 
-void CoordinateSystem::render() {
+void CoordinateSystem::render()
+{
     Point3D::setProjectionMethod(&Point3D::orthographicProjection);
 
     line3D(points[0], points[1], Color::Gray());
@@ -167,7 +171,8 @@ void CoordinateSystem::render() {
 /*
  * @todo !
  */
-Pyramid::Pyramid() {
+Pyramid::Pyramid()
+{
     auto [width, height] = Kernel::SCREEN()->getSize();
 
     pyramidWidth = width;
@@ -183,17 +188,18 @@ Pyramid::Pyramid() {
         Point3D(size + offsetX, -size + offsetY, size + offsetZ),
         Point3D(size + offsetX, size + offsetY, size + offsetZ),
         Point3D(-size + offsetX, size + offsetY, size + offsetZ),
-        Point3D(offsetX, offsetY, -size + offsetZ)
-    };
+        Point3D(offsetX, offsetY, -size + offsetZ)};
 
     layoutIndex = 2;
     mode = isVisible::ON;
 }
 
-void Pyramid::render() {
+void Pyramid::render()
+{
     auto [width, height] = Kernel::SCREEN()->getSize();
 
-    if (width != pyramidWidth || height != pyramidHeight) {
+    if (width != pyramidWidth || height != pyramidHeight)
+    {
         pyramidWidth = width;
         pyramidHeight = height;
 
@@ -207,8 +213,7 @@ void Pyramid::render() {
             Point3D(size + offsetX, -size + offsetY, size + offsetZ),
             Point3D(size + offsetX, size + offsetY, size + offsetZ),
             Point3D(-size + offsetX, size + offsetY, size + offsetZ),
-            Point3D(offsetX, offsetY, -size + offsetZ)
-        };
+            Point3D(offsetX, offsetY, -size + offsetZ)};
     }
 
     Point3D::setProjectionMethod(&Point3D::perspectiveProjection);
@@ -232,8 +237,9 @@ void Pyramid::render() {
     line3D(points[3], points[4], color);
 }
 
-namespace {
-    std::mt19937 splineGenerator(std::random_device{}());
+namespace
+{
+    std::mt19937 splineGenerator(std::random_device {}());
 }
 
 Spline2D::Spline2D()
@@ -256,20 +262,21 @@ void Spline2D::generatePoints(int width, int height)
 
     std::uniform_real_distribution<double> yDist(height * 0.1, height * 0.9);
 
-    for (int i = 0; i < pointCount; ++i) {
-        points.push_back({xDist(splineGenerator),yDist(splineGenerator)
-        });
+    for (int i = 0; i < pointCount; ++i)
+    {
+        points.push_back({xDist(splineGenerator), yDist(splineGenerator)});
     }
 
     // Сортируем по X, чтобы spline шёл слева направо.
-    std::sort(points.begin(), points.end(), [](const ControlPoint& a, const ControlPoint& b) { return a.x < b.x;});
+    std::sort(points.begin(), points.end(), [](const ControlPoint& a, const ControlPoint& b) { return a.x < b.x; });
 }
 
 void Spline2D::render()
 {
     auto [width, height] = Kernel::SCREEN()->getSize();
 
-    if (points.empty()) {
+    if (points.empty())
+    {
         generatePoints(width, height);
     }
 
@@ -283,7 +290,8 @@ void Spline2D::drawSpline()
 
     constexpr double step = 0.01;
 
-    for (size_t i = 0; i + 1 < points.size(); ++i) {
+    for (size_t i = 0; i + 1 < points.size(); ++i)
+    {
 
         // Для Catmull-Rom нужны точки:
         //
@@ -292,7 +300,6 @@ void Spline2D::drawSpline()
         // Кривая строится между P1 и P2.
 
         const ControlPoint& p0 = (i == 0) ? points[i] : points[i - 1];
-
 
         const ControlPoint& p1 = points[i];
 
@@ -303,40 +310,39 @@ void Spline2D::drawSpline()
         int prevX = static_cast<int>(p1.x);
         int prevY = static_cast<int>(p1.y);
 
-        for (double t = step; t <= 1.0; t += step) {
+        for (double t = step; t <= 1.0; t += step)
+        {
 
             const double t2 = t * t;
             const double t3 = t2 * t;
 
-            const double x = 0.5 * (2.0 * p1.x + (-p0.x + p2.x) * t + (2.0 * p0.x - 5.0 * p1.x +  4.0 * p2.x - p3.x) * t2 + (-p0.x + 3.0 * p1.x - 3.0 * p2.x + p3.x) * t3 );
+            const double x = 0.5 * (2.0 * p1.x + (-p0.x + p2.x) * t + (2.0 * p0.x - 5.0 * p1.x + 4.0 * p2.x - p3.x) * t2 + (-p0.x + 3.0 * p1.x - 3.0 * p2.x + p3.x) * t3);
 
             const double y =
                 0.5 *
-                (
-                    2.0 * p1.y +
-                    (-p0.y + p2.y) * t +
-                    (2.0 * p0.y - 5.0 * p1.y +
-                     4.0 * p2.y - p3.y) * t2 +
-                    (-p0.y + 3.0 * p1.y -
-                     3.0 * p2.y + p3.y) * t3
-                );
+                (2.0 * p1.y +
+                 (-p0.y + p2.y) * t +
+                 (2.0 * p0.y - 5.0 * p1.y +
+                  4.0 * p2.y - p3.y) *
+                     t2 +
+                 (-p0.y + 3.0 * p1.y -
+                  3.0 * p2.y + p3.y) *
+                     t3);
 
             const int currentX = static_cast<int>(x);
             const int currentY = static_cast<int>(y);
 
-            line(prevX,prevY,currentX,currentY, Color::White());
+            line(prevX, prevY, currentX, currentY, Color::White());
             prevX = currentX;
             prevY = currentY;
         }
     }
 }
 
-
 RayTracedSphere::Vec3 RayTracedSphere::Vec3::operator+(const Vec3& other) const
 {
     return {x + other.x, y + other.y,
-        z + other.z
-    };
+            z + other.z};
 }
 
 RayTracedSphere::Vec3 RayTracedSphere::Vec3::operator-(const Vec3& other) const
@@ -344,8 +350,7 @@ RayTracedSphere::Vec3 RayTracedSphere::Vec3::operator-(const Vec3& other) const
     return {
         x - other.x,
         y - other.y,
-        z - other.z
-    };
+        z - other.z};
 }
 
 RayTracedSphere::Vec3
@@ -354,16 +359,14 @@ RayTracedSphere::Vec3::operator*(double value) const
     return {
         x * value,
         y * value,
-        z * value
-    };
+        z * value};
 }
 
 double RayTracedSphere::Vec3::dot(const Vec3& other) const
 {
-    return
-        x * other.x +
-        y * other.y +
-        z * other.z;
+    return x * other.x +
+           y * other.y +
+           z * other.z;
 }
 
 double RayTracedSphere::Vec3::length() const
@@ -382,11 +385,8 @@ RayTracedSphere::Vec3::normalized() const
     return {
         x / len,
         y / len,
-        z / len
-    };
+        z / len};
 }
-
-
 
 RayTracedSphere::RayTracedSphere()
 {
@@ -396,33 +396,26 @@ RayTracedSphere::RayTracedSphere()
     auto [width, height] = Kernel::SCREEN()->getSize();
 
     sphere = {
-        {
-            width / 2.0,
-            height / 2.0,
-            0.0
-        },
-        std::min(width, height) * 0.3
-    };
+        {width / 2.0,
+         height / 2.0,
+         0.0},
+        std::min(width, height) * 0.3};
 
     camera = {
         width / 2.0,
         height / 2.0,
-        -500.0
-    };
+        -500.0};
 
     light = {
         width / 3.0,
         height / 3.0,
-        -300.0
-    };
+        -300.0};
 }
-
 
 bool RayTracedSphere::intersect(
     const Ray& ray,
     const Sphere& sphere,
-    double& distance
-) const
+    double& distance) const
 {
     const Vec3 oc = ray.origin - sphere.center;
 
@@ -448,12 +441,14 @@ bool RayTracedSphere::intersect(
     const double t2 =
         (-b + sqrtDiscriminant) / (2.0 * a);
 
-    if (t1 > 0.0) {
+    if (t1 > 0.0)
+    {
         distance = t1;
         return true;
     }
 
-    if (t2 > 0.0) {
+    if (t2 > 0.0)
+    {
         distance = t2;
         return true;
     }
@@ -461,11 +456,9 @@ bool RayTracedSphere::intersect(
     return false;
 }
 
-
 Pixel RayTracedSphere::calculatePixel(
     const Vec3& point,
-    const Vec3& normal
-) const
+    const Vec3& normal) const
 {
     Vec3 lightDirection =
         (light - point).normalized();
@@ -490,10 +483,8 @@ Pixel RayTracedSphere::calculatePixel(
     return Pixel(
         value,
         value,
-        value
-    );
+        value);
 }
-
 
 void RayTracedSphere::render()
 {
@@ -508,9 +499,11 @@ void RayTracedSphere::render()
     camera.x = width / 2.0;
     camera.y = height / 2.0;
 
-    for (int y = 0; y < height; ++y) {
+    for (int y = 0; y < height; ++y)
+    {
 
-        for (int x = 0; x < width; ++x) {
+        for (int x = 0; x < width; ++x)
+        {
 
             Ray ray;
 
@@ -519,12 +512,12 @@ void RayTracedSphere::render()
             ray.direction = Vec3 {
                 static_cast<double>(x) - camera.x,
                 static_cast<double>(y) - camera.y,
-                500.0
-            }.normalized();
+                500.0}
+                                .normalized();
 
             double distance;
 
-            if (!intersect(ray, sphere, distance))
+            if (! intersect(ray, sphere, distance))
                 continue;
 
             const Vec3 hitPoint =
@@ -541,9 +534,7 @@ void RayTracedSphere::render()
 
             Kernel::SCREEN()->addShape(
                 pixel,
-                layoutIndex
-            );
+                layoutIndex);
         }
     }
 }
-

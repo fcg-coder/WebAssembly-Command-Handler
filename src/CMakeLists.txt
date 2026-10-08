@@ -93,12 +93,14 @@ add_executable(main main.cpp)
 
 add_subdirectory(kernel)
 add_subdirectory(graphic_lib)
+add_subdirectory(scenes)
 add_subdirectory(command_handler)
 
 target_link_libraries(main PRIVATE
     kernel
     graphic_lib
     command_handler
+    scenes
 )
 
 # ============================================
@@ -139,9 +141,9 @@ if(USE_TERMINAL)
 
     endif()
 
-# ============================================
-# WebAssembly
-# ============================================
+    # ============================================
+    # WebAssembly
+    # ============================================
 
 elseif(USE_WEBASM)
 
