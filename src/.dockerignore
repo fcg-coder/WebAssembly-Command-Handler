@@ -1,0 +1,11 @@
+build/
+**/*.o
+**/*.a
+**/CMakeFiles/
+**/CMakeCache.txt
+.git
+.gitignore
+.vscode
+.idea
+*.swp
+Dockerfile*
